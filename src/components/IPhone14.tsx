@@ -31,7 +31,10 @@ export const IPhone14: React.FC<{ children: React.ReactNode }> = ({
         background: "#000",
       }}
     >
-      {children}
+      {/* Crop status bar (time/battery) — 70px = ~47pt at this scale */}
+      <div style={{ position: "absolute", inset: 0, top: -70 }}>
+        {children}
+      </div>
     </div>
     {/* Dynamic Island */}
     <div
