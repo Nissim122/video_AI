@@ -1,7 +1,7 @@
 import React from "react";
 import { useCurrentFrame, useVideoConfig, spring, interpolate } from "remotion";
 import { BRAND } from "../brand";
-import { ScreenRegion } from "../screens/screen-1-pain.coords";
+import { ScreenRegion } from "../types";
 
 type Side = "top" | "bottom" | "left" | "right";
 

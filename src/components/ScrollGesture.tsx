@@ -1,6 +1,7 @@
 import React from "react";
 import { useCurrentFrame, useVideoConfig, spring, interpolate } from "remotion";
 import { BRAND } from "../brand";
+import { HandPointer, SkinTone } from "./HandPointer";
 
 interface ScrollGestureProps {
   startAt: number;
@@ -9,28 +10,30 @@ interface ScrollGestureProps {
   x?: string;
   /** vertical center of the gesture as % of screen height (default "60%") */
   y?: string;
-  color?: string;
+  skinTone?: SkinTone;
 }
+
+// HandPointer at size=80
+const HAND_W = 80;
+const HAND_H = 80 * 1.94; // ≈ 155px
 
 export const ScrollGesture: React.FC<ScrollGestureProps> = ({
   startAt,
   direction = "up",
   x = "50%",
   y = "60%",
-  color = BRAND.blueL,
+  skinTone = "light",
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
 
-  const DURATION = 28; // frames for the swipe gesture
+  const DURATION = 28;
 
-  // appear
   const handOpacity = interpolate(frame, [startAt, startAt + 8], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  // slide spring — finger travels 120px in the given direction
   const slideProgress = spring({
     frame: frame - startAt,
     fps,
@@ -38,12 +41,12 @@ export const ScrollGesture: React.FC<ScrollGestureProps> = ({
   });
 
   const travelPx = 120;
-  const travel = interpolate(slideProgress, [0, 1], [0, direction === "up" ? -travelPx : travelPx]);
+  const travel = interpolate(
+    slideProgress,
+    [0, 1],
+    [0, direction === "up" ? -travelPx : travelPx]
+  );
 
-  // trail dots — 3 dots that follow behind the finger
-  const trailCount = 3;
-
-  // fade out near the end
   const gestureOpacity = interpolate(
     frame,
     [startAt + DURATION, startAt + DURATION + 10],
@@ -51,18 +54,23 @@ export const ScrollGesture: React.FC<ScrollGestureProps> = ({
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
+  // Trail dots trailing behind the finger
+  const trailCount = 3;
+
   return (
     <div
       style={{
         position: "absolute",
         top: y,
         left: x,
-        transform: "translate(-50%, -50%)",
+        // Center on the fingertip position (fingertip = bottom-center of hand SVG)
+        marginLeft: -(HAND_W / 2) + 1,
+        marginTop: -HAND_H,
         opacity: gestureOpacity,
         pointerEvents: "none",
       }}
     >
-      {/* Trail dots */}
+      {/* Trail dots behind the fingertip */}
       {Array.from({ length: trailCount }).map((_, i) => {
         const trailDelay = (i + 1) * 6;
         const trailProgress = spring({
@@ -87,14 +95,15 @@ export const ScrollGesture: React.FC<ScrollGestureProps> = ({
             key={i}
             style={{
               position: "absolute",
-              top: 0,
-              left: 0,
+              // dots follow the fingertip (bottom center of SVG)
+              top: HAND_H,
+              left: HAND_W / 2,
               width: 18,
               height: 18,
               marginTop: -9,
               marginLeft: -9,
               borderRadius: "50%",
-              background: color,
+              background: BRAND.blueL,
               opacity: trailOpacity,
               transform: `translateY(${trailTravel}px)`,
             }}
@@ -102,20 +111,15 @@ export const ScrollGesture: React.FC<ScrollGestureProps> = ({
         );
       })}
 
-      {/* Finger */}
+      {/* Hand */}
       <div
         style={{
           opacity: handOpacity,
           transform: `translateY(${travel}px)`,
-          fontSize: 44,
-          lineHeight: 1,
-          userSelect: "none",
-          // flip emoji if scrolling down
-          display: "inline-block",
-          rotate: direction === "down" ? "180deg" : "0deg",
+          filter: "drop-shadow(0 4px 14px rgba(0,0,0,0.5))",
         }}
       >
-        👆
+        <HandPointer pressProgress={0.3} skinTone={skinTone} size={HAND_W} />
       </div>
     </div>
   );

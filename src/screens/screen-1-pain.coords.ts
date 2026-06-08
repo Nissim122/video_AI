@@ -1,13 +1,9 @@
-export type ScreenRegion = {
-  top: string;
-  left: string;
-  width: string;
-  height: string;
-};
+import { ScreenRegion } from "../types";
+export type { ScreenRegion };
 
 export const SCREEN_1_PAIN: Record<string, ScreenRegion> = {
   // ── שורה 1 ──
-  card_tiaum_pgishut:   { top: "29%", left: "4%",  width: "29%", height: "19%" },
+  card_tiaum_pgishut:   { top: "29%", left: "1%",  width: "31.9%", height: "17.1%" },
   card_sherut_lekuchot: { top: "33%", left: "34%", width: "29%", height: "19%" },
   card_nihul_lidim:     { top: "33%", left: "66%", width: "32%", height: "19%" },
 

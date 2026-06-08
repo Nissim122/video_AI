@@ -1,12 +1,22 @@
-import { AbsoluteFill, useCurrentFrame, interpolate, staticFile, Img } from "remotion";
+import React from "react";
+import {
+  AbsoluteFill,
+  useCurrentFrame,
+  useVideoConfig,
+  interpolate,
+  spring,
+  staticFile,
+  Img,
+  Easing,
+} from "remotion";
 import { loadFont } from "@remotion/google-fonts/Heebo";
 import { z } from "zod";
 import { BRAND } from "./brand";
-import { IPhone14 } from "./components/IPhone14";
-import { TapEffect } from "./components/TapEffect";
+import { PhoneEntrance } from "./components/PhoneEntrance";
+import { GlowHighlight } from "./components/GlowHighlight";
 import { useFadeIn } from "./hooks/useFadeIn";
-import { useSpringEntrance } from "./hooks/useSpringEntrance";
 import { SCREEN_1_PAIN } from "./screens/screen-1-pain.coords";
+import { T } from "./scenes/timeline";
 
 const { fontFamily } = loadFont();
 
@@ -19,15 +29,15 @@ export const CompositionSchema = z.object({
 
 export type CompositionProps = z.infer<typeof CompositionSchema>;
 
-// ── Timings (frames @ 30fps) ──
-const HOOK_START = 0;
-const HOOK_PEAK = 18;
-const HOOK_HOLD = 32;
-const HOOK_OUT = 45;
-const IPHONE_START = 45;
-const ZOOM_START = 78;
-const ZOOM_END = 120;
-const GLOW_START = 122;
+// ── Timings ───────────────────────────────────────────────────────────────────
+const HOOK_PEAK  = 10;                          // fast punch (was 18)
+const HOOK_HOLD  = 20;                          // short hold (was 32)
+
+const PHONE_IN   = T.screen1.start;             // 36 — enters immediately
+const ZOOM_START = T.screen1.start + 26;        // 62
+const ZOOM_END   = T.screen1.start + 54;        // 90 — aggressive ramp (was +75)
+const GLOW_START = T.screen1.start + 54;        // 90
+const CTA_START  = T.screen1.start + 68;        // 104
 
 export const MyComposition: React.FC<CompositionProps> = ({
   hookText,
@@ -36,38 +46,66 @@ export const MyComposition: React.FC<CompositionProps> = ({
   screenImage,
 }) => {
   const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
 
-  // ── Hook text ──
+  // ── Hook text — scale punch + fast fade ──────────────────────────────────
   const hookOpacity = useFadeIn({
-    start: HOOK_START,
-    duration: HOOK_PEAK - HOOK_START,
+    start: T.hook.start,
+    duration: HOOK_PEAK,
     fadeOutStart: HOOK_HOLD,
-    fadeOutDuration: HOOK_OUT - HOOK_HOLD,
+    fadeOutDuration: T.hook.duration - HOOK_HOLD,
   });
-  const hookY = interpolate(frame, [HOOK_START, HOOK_PEAK], [36, 0], {
+  const hookY = interpolate(frame, [T.hook.start, HOOK_PEAK], [48, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
+  });
+  const hookScale = interpolate(frame, [T.hook.start, HOOK_PEAK], [1.14, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
+  });
+
+  // Sub-text — staggered +5 frames
+  const subOpacity = useFadeIn({
+    start: T.hook.start + 5,
+    duration: 9,
+    fadeOutStart: HOOK_HOLD,
+    fadeOutDuration: T.hook.duration - HOOK_HOLD,
+  });
+  const subY = interpolate(frame, [T.hook.start + 5, HOOK_PEAK + 5], [26, 0], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.out(Easing.cubic),
+  });
+
+  // ── Flash on phone arrival ────────────────────────────────────────────────
+  const flashOpacity = interpolate(
+    frame,
+    [PHONE_IN, PHONE_IN + 4, PHONE_IN + 16],
+    [0, 0.14, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+
+  // ── Zoom into phone — more aggressive ────────────────────────────────────
+  const zoomScale = interpolate(frame, [ZOOM_START, ZOOM_END], [1, 1.28], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.bezier(0.22, 1, 0.36, 1),
+  });
+
+  // ── CTA — spring bounce ───────────────────────────────────────────────────
+  const ctaProgress = spring({
+    frame: frame - CTA_START,
+    fps,
+    config: { damping: 9, stiffness: 210, mass: 0.75 },
+  });
+  const ctaScale   = interpolate(ctaProgress, [0, 1], [0.6, 1]);
+  const ctaOpacity = interpolate(frame, [CTA_START, CTA_START + 6], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-
-  // ── iPhone spring entrance ──
-  const { translateY: iphoneY, opacity: iphoneOpacity } = useSpringEntrance({
-    start: IPHONE_START,
-    distance: 900,
-  });
-
-  // ── Zoom into iPhone ──
-  const zoomScale = interpolate(frame, [ZOOM_START, ZOOM_END], [1, 1.15], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: (t) => (t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t),
-  });
-
-  // ── Label annotation ──
-  const arrowOpacity = useFadeIn({ start: GLOW_START + 10, duration: 12 });
-  const arrowY = interpolate(frame, [GLOW_START + 10, GLOW_START + 22], [16, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  const ctaY = interpolate(ctaProgress, [0, 1], [28, 0]);
 
   return (
     <AbsoluteFill
@@ -77,7 +115,7 @@ export const MyComposition: React.FC<CompositionProps> = ({
       <AbsoluteFill
         style={{
           background:
-            "radial-gradient(ellipse at 50% 40%, rgba(33,150,176,0.08) 0%, transparent 65%)",
+            "radial-gradient(ellipse at 50% 40%, rgba(33,150,176,0.10) 0%, transparent 65%)",
         }}
       />
 
@@ -88,9 +126,7 @@ export const MyComposition: React.FC<CompositionProps> = ({
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: 24,
-          opacity: hookOpacity,
-          transform: `translateY(${hookY}px)`,
+          gap: 22,
           padding: "0 80px",
           pointerEvents: "none",
         }}
@@ -102,19 +138,28 @@ export const MyComposition: React.FC<CompositionProps> = ({
             fontWeight: 800,
             textAlign: "center",
             lineHeight: 1.3,
-            textShadow: "0 4px 60px rgba(33,150,176,0.3)",
+            textShadow: "0 4px 60px rgba(33,150,176,0.35)",
+            opacity: hookOpacity,
+            transform: `translateY(${hookY}px) scale(${hookScale})`,
           }}
         >
           {hookText}
         </div>
         <div
-          style={{ color: BRAND.muted, fontSize: 40, fontWeight: 400, textAlign: "center" }}
+          style={{
+            color: BRAND.muted,
+            fontSize: 40,
+            fontWeight: 400,
+            textAlign: "center",
+            opacity: subOpacity,
+            transform: `translateY(${subY}px)`,
+          }}
         >
           {subText}
         </div>
       </AbsoluteFill>
 
-      {/* ════ IPHONE + CONTENT ════ */}
+      {/* ════ PHONE + CTA ════ */}
       <AbsoluteFill
         style={{
           display: "flex",
@@ -122,27 +167,27 @@ export const MyComposition: React.FC<CompositionProps> = ({
           alignItems: "center",
           justifyContent: "center",
           gap: 40,
-          opacity: iphoneOpacity,
-          transform: `translateY(${iphoneY}px) scale(${zoomScale})`,
         }}
       >
-        <IPhone14>
-          <Img
-            src={staticFile(screenImage)}
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          />
+        {/* Zoom wrapper */}
+        <div style={{ transform: `scale(${zoomScale})`, transformOrigin: "center center" }}>
+          <PhoneEntrance variant="perspectiveLeft" delay={PHONE_IN}>
+            <Img
+              src={staticFile(screenImage)}
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            />
+            <GlowHighlight
+              pos={SCREEN_1_PAIN.card_tiaum_pgishut}
+              startAt={GLOW_START}
+            />
+          </PhoneEntrance>
+        </div>
 
-          <TapEffect
-            pos={SCREEN_1_PAIN.card_tiaum_pgishut}
-            startAt={GLOW_START}
-          />
-        </IPhone14>
-
-        {/* Arrow + label */}
+        {/* CTA — spring bounce */}
         <div
           style={{
-            opacity: arrowOpacity,
-            transform: `translateY(${arrowY}px)`,
+            opacity: ctaOpacity,
+            transform: `scale(${ctaScale}) translateY(${ctaY}px)`,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -159,13 +204,16 @@ export const MyComposition: React.FC<CompositionProps> = ({
               fill="none"
             />
           </svg>
-          <div
-            style={{ color: BRAND.blueL, fontSize: 34, fontWeight: 700, whiteSpace: "nowrap" }}
-          >
+          <div style={{ color: BRAND.blueL, fontSize: 34, fontWeight: 700, whiteSpace: "nowrap" }}>
             {ctaText}
           </div>
         </div>
       </AbsoluteFill>
+
+      {/* ════ FLASH on phone arrival ════ */}
+      <AbsoluteFill
+        style={{ background: "#ffffff", opacity: flashOpacity, pointerEvents: "none" }}
+      />
     </AbsoluteFill>
   );
 };
