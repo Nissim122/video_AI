@@ -11,13 +11,22 @@ export const SCANNER_DURATION = 80; // ~2.7s total
 // Returns opacity for image i at the current frame — dissolves in/out
 function imageOpacity(frame: number, i: number): number {
   const start = i * FRAMES_PER_IMAGE;
-  const fadeInStart = Math.max(0, start - CROSSFADE);
+  const fadeInStart = start - CROSSFADE; // may be negative for i=0
   const fadeOutStart = start + FRAMES_PER_IMAGE - CROSSFADE;
   const fadeOutEnd = start + FRAMES_PER_IMAGE;
 
   if (i === FRAMES_COUNT - 1) {
-    // Last frame: fade in and hold (no fade-out — the scene exit handles it)
+    // Last frame: fade in and hold
+    if (fadeInStart >= start) return 1; // no fade-in needed
     return interpolate(frame, [fadeInStart, start], [0, 1], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+  }
+
+  if (fadeInStart >= start) {
+    // No room for fade-in (i=0 with CROSSFADE=0), just fade-out
+    return interpolate(frame, [fadeOutStart, fadeOutEnd], [1, 0], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
     });
