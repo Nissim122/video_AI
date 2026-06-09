@@ -1,6 +1,7 @@
 import React from "react";
 import { useCurrentFrame, useVideoConfig, spring, interpolate, Img, staticFile } from "remotion";
 import { PhoneEntrance } from "../components/PhoneEntrance";
+import { CircleClick } from "../components/CircleClick";
 
 // ── Timing (frames relative to scene start) ────────────────────────────────
 const PAUSE_1_END = 28;
@@ -12,9 +13,28 @@ const SCROLL_SPRING = { damping: 22, stiffness: 260, mass: 0.7 };
 
 // image: 1170×7479 → rendered at width 548 → height ≈ 3503px
 // IPhone14 hides first 70px (top:-70). TOP_CROP adds extra to hide the Clix banner.
-// max scroll = 3503 - 1290 - TOP_CROP = 2213 → 3 steps × 724px
-const TOP_CROP = 64; // +24px (~2% of PHONE_H)
+// Absolute image position formula (px from image top):
+//   page 1: imageY = top_frac × 1290 + TOP_CROP
+//   page 2: imageY = top_frac × 1290 + TOP_CROP + SCROLL_STEP
+//   page 3: imageY = top_frac × 1290 + TOP_CROP + 2×SCROLL_STEP
+const TOP_CROP = 64;
 const SCROLL_STEP = 724;
+
+// ── Click sequence — one circle at a time, no two under the same heading ───
+// imageY/imageX are px from top-left of the rendered image (548px wide).
+// startAt / duration are LOCAL frames (f = logical_global − startAt_scene).
+// Add entries here after confirming positions in Remotion Studio.
+const CLICKS: Array<{
+  imageY: number;
+  imageX: number;
+  size?: number;
+  startAt: number;
+  duration: number;
+  label?: string;
+}> = [
+  // Page 1 — visible before 1st scroll (PAUSE_1_END=28)
+  { imageY: 470, imageX: 48, startAt: 16, duration: 14, label: "Origami (CRM)" },
+];
 
 interface Screen2Props {
   startAt?: number;
@@ -42,15 +62,30 @@ export const Screen2: React.FC<Screen2Props> = ({ startAt = 0, logicalFrame }) =
     <div style={{ opacity: phoneOpacity }}>
       <PhoneEntrance variant="slideFromRight" delay={startAt} frame={logicalFrame}>
         <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
-          <Img
-            src={staticFile("screenshot-3-screen2-mobile.png")}
+          {/* Scrolling wrapper — both image and circles live here so circles track content */}
+          <div
             style={{
+              position: "relative",
               width: "100%",
-              height: "auto",
-              display: "block",
               transform: `translateY(${scrollY}px)`,
             }}
-          />
+          >
+            <Img
+              src={staticFile("screenshot-3-screen2-mobile.png")}
+              style={{ width: "100%", height: "auto", display: "block" }}
+            />
+            {CLICKS.map((c, i) => (
+              <CircleClick
+                key={i}
+                frame={f}
+                imageY={c.imageY}
+                imageX={c.imageX}
+                size={c.size}
+                startAt={c.startAt}
+                duration={c.duration}
+              />
+            ))}
+          </div>
         </div>
       </PhoneEntrance>
     </div>
