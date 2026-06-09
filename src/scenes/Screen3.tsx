@@ -2,6 +2,7 @@ import React from "react";
 import { useCurrentFrame, interpolate, Img, staticFile, Easing } from "remotion";
 import { PhoneEntrance } from "../components/PhoneEntrance";
 import { ScrollGesture } from "../components/ScrollGesture";
+import { CircleClick } from "../components/CircleClick";
 
 // Image: 1170×7878 → rendered at 548px wide → height ≈ 3690px
 // IPhone14 crops 70px from top (status bar). Visible window: 1220px.
@@ -24,7 +25,9 @@ const CLICKS: Array<{
   duration: number;
   label?: string;
 }> = [
-  { imageY: 800, imageX: 493, startAt: 27, duration: 14, label: "click 1" },
+  { imageY: 800, imageX: 493, startAt: 27, duration: 40, label: "click 1" },
+  { imageY: 2188, imageX: 493, startAt: 119, duration: 40, label: "click 2" },
+  { imageY: 3169, imageX: 493, startAt: 169, duration: 40, label: "click 3" },
 ];
 
 interface Screen3Props {
@@ -80,6 +83,13 @@ export const Screen3: React.FC<Screen3Props> = ({ startAt = 0, logicalFrame }) =
                 duration={c.duration}
               />
             ))}
+            <CircleClick
+              frame={f}
+              imageY={3558}
+              imageX={242}
+              startAt={229}
+              duration={14}
+            />
           </div>
         </div>
       </PhoneEntrance>
