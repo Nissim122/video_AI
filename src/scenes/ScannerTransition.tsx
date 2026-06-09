@@ -3,9 +3,33 @@ import { useCurrentFrame, interpolate, Img, staticFile } from "remotion";
 import { PhoneEntrance } from "../components/PhoneEntrance";
 
 const FRAMES_COUNT = 8;
-const FRAMES_PER_IMAGE = 6; // each still shown for 6 Remotion frames → 0.2s at 30fps
+const FRAMES_PER_IMAGE = 9;  // 0.3s per image
+const CROSSFADE = 5;          // smooth dissolve between frames
 
-export const SCANNER_DURATION = 60; // 2 seconds total
+export const SCANNER_DURATION = 80; // ~2.7s total
+
+// Returns opacity for image i at the current frame — dissolves in/out
+function imageOpacity(frame: number, i: number): number {
+  const start = i * FRAMES_PER_IMAGE;
+  const fadeInStart = Math.max(0, start - CROSSFADE);
+  const fadeOutStart = start + FRAMES_PER_IMAGE - CROSSFADE;
+  const fadeOutEnd = start + FRAMES_PER_IMAGE;
+
+  if (i === FRAMES_COUNT - 1) {
+    // Last frame: fade in and hold (no fade-out — the scene exit handles it)
+    return interpolate(frame, [fadeInStart, start], [0, 1], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+  }
+
+  return interpolate(
+    frame,
+    [fadeInStart, start, fadeOutStart, fadeOutEnd],
+    [0, 1, 1, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
+}
 
 export const ScannerTransition: React.FC = () => {
   const frame = useCurrentFrame();
@@ -22,17 +46,13 @@ export const ScannerTransition: React.FC = () => {
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
 
-  const opacity = enterOpacity * exitOpacity;
-  const imageIndex = Math.min(
-    Math.floor(frame / FRAMES_PER_IMAGE),
-    FRAMES_COUNT - 1
-  );
+  const sceneOpacity = enterOpacity * exitOpacity;
 
   // Crops the "Clix Automations" nav bar (IPhone14 already hides the status bar via top:-70)
   const NAV_CROP = 100;
 
   return (
-    <div style={{ opacity }}>
+    <div style={{ opacity: sceneOpacity }}>
       <PhoneEntrance variant="slideUp" delay={0}>
         {/* outer clips anything above the IPhone14 screen area */}
         <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
@@ -51,7 +71,7 @@ export const ScannerTransition: React.FC = () => {
                   height: `calc(100% + ${NAV_CROP}px)`,
                   objectFit: "cover",
                   objectPosition: "top center",
-                  opacity: i === imageIndex ? 1 : 0,
+                  opacity: imageOpacity(frame, i),
                 }}
               />
             ))}
