@@ -1,7 +1,6 @@
 import React from "react";
 import { useCurrentFrame, useVideoConfig, spring, interpolate, Img, staticFile } from "remotion";
 import { PhoneEntrance } from "../components/PhoneEntrance";
-import { STRIP_PAGE_H } from "../components/ScrollingPhoneScreen";
 
 // ── Timing (frames relative to scene start) ────────────────────────────────
 const PAUSE_1_END = 28;

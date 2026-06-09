@@ -18,6 +18,7 @@ import { SCREEN_1_PAIN } from "./screens/screen-1-pain.coords";
 import { T } from "./scenes/timeline";
 import { Screen2 } from "./scenes/Screen2";
 import { ScannerTransition } from "./scenes/ScannerTransition";
+import { Screen3 } from "./scenes/Screen3";
 
 const { fontFamily } = loadFont();
 
@@ -238,8 +239,27 @@ export const MyComposition: React.FC<CompositionProps> = ({
             background: BRAND.bg,
           }}
         >
-          <div style={{ transform: "scale(1.024)", transformOrigin: "center center" }}>
+          <div style={{ transform: "scale(1.28)", transformOrigin: "center center" }}>
             <ScannerTransition />
+          </div>
+        </AbsoluteFill>
+      </Sequence>
+
+      {/* ════ SCREEN 3 ════ */}
+      <Sequence
+        from={logicalToRaw(T.screen3.start)}
+        durationInFrames={logicalToRaw(T.screen3.end) - logicalToRaw(T.screen3.start)}
+      >
+        <AbsoluteFill
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: BRAND.bg,
+          }}
+        >
+          <div style={{ transform: "scale(1.28)", transformOrigin: "center center" }}>
+            <Screen3 startAt={T.screen3.start} logicalFrame={frame} />
           </div>
         </AbsoluteFill>
       </Sequence>
