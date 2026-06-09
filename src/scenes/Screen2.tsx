@@ -35,7 +35,8 @@ const CLICKS: Array<{
   // Page 1 — visible before 1st scroll (PAUSE_1_END=28)
   { imageY: 470, imageX: 48, startAt: 16, duration: 10, label: "Origami (CRM)" },
   { imageY: 1000, imageX: 300, startAt: 20, duration: 14, label: "click 2" },
-  { imageY: 1398, imageX: 427, startAt: 38, duration: 14, label: "click 3" },
+  { imageY: 1781, imageX: 295, startAt: 40, duration: 14, label: "click 3" },
+  { imageY: 1398, imageX: 427, startAt: 38, duration: 14, label: "click 4" },
 ];
 
 interface Screen2Props {
