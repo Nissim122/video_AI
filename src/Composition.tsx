@@ -12,11 +12,13 @@ import {
 import { loadFont } from "@remotion/google-fonts/Heebo";
 import { z } from "zod";
 import { BRAND } from "./brand";
+import { Sequence } from "remotion";
 import { PhoneEntrance } from "./components/PhoneEntrance";
 import { GlowHighlight } from "./components/GlowHighlight";
 import { useFadeIn } from "./hooks/useFadeIn";
 import { SCREEN_1_PAIN } from "./screens/screen-1-pain.coords";
 import { T } from "./scenes/timeline";
+import { Screen2 } from "./scenes/Screen2";
 
 const { fontFamily } = loadFont();
 
@@ -214,6 +216,28 @@ export const MyComposition: React.FC<CompositionProps> = ({
       <AbsoluteFill
         style={{ background: "#ffffff", opacity: flashOpacity, pointerEvents: "none" }}
       />
+
+      {/* ════ SCREEN 2 ════ */}
+      <Sequence from={T.screen2.start} durationInFrames={T.screen2.duration}>
+        <AbsoluteFill
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: BRAND.bg,
+          }}
+        >
+          <Screen2
+            startAt={T.screen2.start}
+            images={[
+              "screen-2-form-1.jpeg",
+              "screen-2-form-2.jpeg",
+              "screen-2-form-3.jpeg",
+              "screen-2-form-4.jpeg",
+            ]}
+          />
+        </AbsoluteFill>
+      </Sequence>
     </AbsoluteFill>
   );
 };

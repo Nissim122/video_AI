@@ -9,6 +9,10 @@ interface GlowHighlightProps {
   color?: string;
   /** show a checkmark badge in the corner (default true) */
   badge?: boolean;
+  /** 'rect' = rounded rectangle (default), 'circle' = full circle */
+  shape?: "rect" | "circle";
+  /** if set, fade out over the last 10 frames before startAt + duration */
+  duration?: number;
 }
 
 export const GlowHighlight: React.FC<GlowHighlightProps> = ({
@@ -16,6 +20,8 @@ export const GlowHighlight: React.FC<GlowHighlightProps> = ({
   startAt,
   color = BRAND.blue,
   badge = true,
+  shape = "rect",
+  duration,
 }) => {
   const frame = useCurrentFrame();
 
@@ -23,6 +29,14 @@ export const GlowHighlight: React.FC<GlowHighlightProps> = ({
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
+  const fadeOut =
+    duration !== undefined
+      ? interpolate(frame, [startAt + duration - 10, startAt + duration], [1, 0], {
+          extrapolateLeft: "clamp",
+          extrapolateRight: "clamp",
+        })
+      : 1;
+  const combinedOpacity = opacity * fadeOut;
   const pulse = 0.7 + Math.sin((frame - startAt) * 0.22) * 0.3;
 
   return (
@@ -33,18 +47,18 @@ export const GlowHighlight: React.FC<GlowHighlightProps> = ({
         left: pos.left,
         width: pos.width,
         height: pos.height,
-        borderRadius: 16,
-        background: `${color}${Math.round(0.18 * opacity * 255).toString(16).padStart(2, "0")}`,
+        borderRadius: shape === "circle" ? "50%" : 16,
+        background: `${color}${Math.round(0.18 * combinedOpacity * 255).toString(16).padStart(2, "0")}`,
         border: `3px solid ${color}`,
         boxShadow: `
-          0 0 0 6px ${color}${Math.round(0.18 * opacity * pulse * 255).toString(16).padStart(2, "0")},
-          0 0 32px ${color}${Math.round(0.55 * opacity * pulse * 255).toString(16).padStart(2, "0")}
+          0 0 0 6px ${color}${Math.round(0.18 * combinedOpacity * pulse * 255).toString(16).padStart(2, "0")},
+          0 0 32px ${color}${Math.round(0.55 * combinedOpacity * pulse * 255).toString(16).padStart(2, "0")}
         `,
-        opacity,
+        opacity: combinedOpacity,
         pointerEvents: "none",
       }}
     >
-      {badge && (
+      {badge && shape !== "circle" && (
         <div
           style={{
             position: "absolute",
