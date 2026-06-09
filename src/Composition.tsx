@@ -14,6 +14,7 @@ import { BRAND } from "./brand";
 import { Sequence } from "remotion";
 import { PhoneEntrance } from "./components/PhoneEntrance";
 import { GlowHighlight } from "./components/GlowHighlight";
+import { CircleClick } from "./components/CircleClick";
 import { SCREEN_1_PAIN } from "./screens/screen-1-pain.coords";
 import { T } from "./scenes/timeline";
 import { Screen2 } from "./scenes/Screen2";
@@ -197,9 +198,12 @@ export const MyComposition: React.FC<CompositionProps> = ({
               src={staticFile(screenImage)}
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
             />
-            <GlowHighlight
-              pos={SCREEN_1_PAIN.card_tiaum_pgishut}
+            <CircleClick
+              frame={frame}
+              imageY={470}
+              imageX={425}
               startAt={GLOW_START}
+              duration={20}
             />
           </PhoneEntrance>
         </div>
