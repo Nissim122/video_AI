@@ -30,15 +30,26 @@ export const CompositionSchema = z.object({
 
 export type CompositionProps = z.infer<typeof CompositionSchema>;
 
-// ── Speed remap: raw frames [30, 60] play at 2× → saves 15 output frames ─────
-const SPEED = { start: 30, end: 60, factor: 2 } as const;
-export const SPEED_SAVINGS = (SPEED.end - SPEED.start) * (1 - 1 / SPEED.factor); // 15
+// ── Speed sections (raw output frame ranges) ─────────────────────────────────
+// Section 1: raw 30–45   → logical 30–60   (2×, saves 15 frames)
+// Section 2: raw 210–240 → logical 225–285 (2×, saves 30 frames)
+export const SPEED_SAVINGS = 45; // total saved output frames
 
 function remapFrame(raw: number): number {
-  const compressedLen = (SPEED.end - SPEED.start) / SPEED.factor; // 15
-  if (raw <= SPEED.start) return raw;
-  if (raw <= SPEED.start + compressedLen) return SPEED.start + (raw - SPEED.start) * SPEED.factor;
-  return SPEED.end + (raw - (SPEED.start + compressedLen));
+  if (raw <= 30)  return raw;
+  if (raw <= 45)  return 30 + (raw - 30) * 2;
+  if (raw < 210)  return raw + 15;
+  if (raw <= 240) return 225 + (raw - 210) * 2;
+  return raw + 45;
+}
+
+// Inverse of remapFrame — logical → raw (used for Sequence from/duration)
+function logicalToRaw(logical: number): number {
+  if (logical <= 30)  return logical;
+  if (logical <= 60)  return 30 + (logical - 30) / 2;
+  if (logical < 225)  return logical - 15;
+  if (logical <= 285) return 210 + (logical - 225) / 2;
+  return logical - 45;
 }
 
 // ── Timings ───────────────────────────────────────────────────────────────────
@@ -199,7 +210,10 @@ export const MyComposition: React.FC<CompositionProps> = ({
       />
 
       {/* ════ SCREEN 2 ════ */}
-      <Sequence from={T.screen2.start - SPEED_SAVINGS} durationInFrames={T.screen2.duration}>
+      <Sequence
+        from={logicalToRaw(T.screen2.start)}
+        durationInFrames={logicalToRaw(T.screen2.end) - logicalToRaw(T.screen2.start)}
+      >
         <AbsoluteFill
           style={{
             display: "flex",
@@ -209,13 +223,13 @@ export const MyComposition: React.FC<CompositionProps> = ({
           }}
         >
           <div style={{ transform: "scale(1.28)", transformOrigin: "center center" }}>
-          <Screen2 startAt={0} />
+            <Screen2 startAt={T.screen2.start} logicalFrame={frame} />
           </div>
         </AbsoluteFill>
       </Sequence>
 
       {/* ════ SCANNER TRANSITION ════ */}
-      <Sequence from={T.scannerTransition.start - SPEED_SAVINGS} durationInFrames={T.scannerTransition.duration}>
+      <Sequence from={logicalToRaw(T.scannerTransition.start)} durationInFrames={T.scannerTransition.duration}>
         <AbsoluteFill
           style={{
             display: "flex",

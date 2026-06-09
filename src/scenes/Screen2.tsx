@@ -18,11 +18,13 @@ const TOP_CROP = 64; // +24px (~2% of PHONE_H)
 const SCROLL_STEP = 724;
 
 interface Screen2Props {
-  startAt: number;
+  startAt?: number;
+  logicalFrame?: number;
 }
 
-export const Screen2: React.FC<Screen2Props> = ({ startAt }) => {
-  const frame = useCurrentFrame();
+export const Screen2: React.FC<Screen2Props> = ({ startAt = 0, logicalFrame }) => {
+  const rawFrame = useCurrentFrame();
+  const frame = logicalFrame ?? rawFrame;
   const { fps } = useVideoConfig();
   const f = Math.max(0, frame - startAt);
 
@@ -39,7 +41,7 @@ export const Screen2: React.FC<Screen2Props> = ({ startAt }) => {
 
   return (
     <div style={{ opacity: phoneOpacity }}>
-      <PhoneEntrance variant="slideFromRight" delay={startAt}>
+      <PhoneEntrance variant="slideFromRight" delay={startAt} frame={logicalFrame}>
         <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
           <Img
             src={staticFile("screenshot-3-screen2-mobile.png")}
