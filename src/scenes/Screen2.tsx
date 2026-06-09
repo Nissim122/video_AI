@@ -41,6 +41,7 @@ const CLICKS: Array<{
   { imageY: 2579, imageX: 173, startAt: 64, duration: 14, label: "click 6" },
   { imageY: 2830, imageX: 426, startAt: 84, duration: 14, label: "click 7" },
   { imageY: 3076, imageX: 172, startAt: 93, duration: 14, label: "click 8" },
+  { imageY: 3371, imageX: 175, startAt: 104, duration: 14, label: "click 9" },
 ];
 
 interface Screen2Props {
