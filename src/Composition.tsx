@@ -208,15 +208,7 @@ export const MyComposition: React.FC<CompositionProps> = ({
           }}
         >
           <div style={{ transform: "scale(1.28)", transformOrigin: "center center" }}>
-          <Screen2
-            startAt={0}
-            images={[
-              "screen-2-form-1.jpeg",
-              "screen-2-form-2.jpeg",
-              "screen-2-form-3.jpeg",
-              "screen-2-form-4.jpeg",
-            ]}
-          />
+          <Screen2 startAt={0} />
           </div>
         </AbsoluteFill>
       </Sequence>
