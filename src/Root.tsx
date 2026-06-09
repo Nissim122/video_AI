@@ -1,7 +1,7 @@
 import "./index.css";
 import React from "react";
 import { Composition, AbsoluteFill, staticFile, Img } from "remotion";
-import { MyComposition, CompositionSchema } from "./Composition";
+import { MyComposition, CompositionSchema, SPEED_SAVINGS } from "./Composition";
 import { T } from "./scenes/timeline";
 import { PhoneEntrance, PhoneVariant } from "./components/PhoneEntrance";
 import { loadFont } from "@remotion/google-fonts/Heebo";
@@ -15,6 +15,7 @@ const LABELS: Record<PhoneVariant, string> = {
   perspectiveLeft: "Perspective Left",
   floatIn: "Float In",
   dropBounce: "Drop Bounce",
+  slideFromRight: "Slide From Right",
 };
 
 const PhoneShowcase: React.FC = () => (
@@ -77,7 +78,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="MyComp"
         component={MyComposition}
-        durationInFrames={T.total}
+        durationInFrames={T.total - SPEED_SAVINGS}
         fps={30}
         width={1080}
         height={1920}

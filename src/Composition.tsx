@@ -4,7 +4,6 @@ import {
   useCurrentFrame,
   useVideoConfig,
   interpolate,
-  spring,
   staticFile,
   Img,
   Easing,
@@ -15,7 +14,6 @@ import { BRAND } from "./brand";
 import { Sequence } from "remotion";
 import { PhoneEntrance } from "./components/PhoneEntrance";
 import { GlowHighlight } from "./components/GlowHighlight";
-import { useFadeIn } from "./hooks/useFadeIn";
 import { SCREEN_1_PAIN } from "./screens/screen-1-pain.coords";
 import { T } from "./scenes/timeline";
 import { Screen2 } from "./scenes/Screen2";
@@ -31,6 +29,17 @@ export const CompositionSchema = z.object({
 
 export type CompositionProps = z.infer<typeof CompositionSchema>;
 
+// ── Speed remap: raw frames [30, 60] play at 2× → saves 15 output frames ─────
+const SPEED = { start: 30, end: 60, factor: 2 } as const;
+export const SPEED_SAVINGS = (SPEED.end - SPEED.start) * (1 - 1 / SPEED.factor); // 15
+
+function remapFrame(raw: number): number {
+  const compressedLen = (SPEED.end - SPEED.start) / SPEED.factor; // 15
+  if (raw <= SPEED.start) return raw;
+  if (raw <= SPEED.start + compressedLen) return SPEED.start + (raw - SPEED.start) * SPEED.factor;
+  return SPEED.end + (raw - (SPEED.start + compressedLen));
+}
+
 // ── Timings ───────────────────────────────────────────────────────────────────
 const HOOK_PEAK  = 10;                          // fast punch (was 18)
 const HOOK_HOLD  = 20;                          // short hold (was 32)
@@ -39,7 +48,6 @@ const PHONE_IN   = T.screen1.start;             // 36 — enters immediately
 const ZOOM_START = T.screen1.start + 26;        // 62
 const ZOOM_END   = T.screen1.start + 54;        // 90 — aggressive ramp (was +75)
 const GLOW_START = T.screen1.start + 54;        // 90
-const CTA_START  = T.screen1.start + 68;        // 104
 
 export const MyComposition: React.FC<CompositionProps> = ({
   hookText,
@@ -47,16 +55,17 @@ export const MyComposition: React.FC<CompositionProps> = ({
   ctaText,
   screenImage,
 }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const rawFrame = useCurrentFrame();
+  const frame = remapFrame(rawFrame);
+  useVideoConfig();
 
   // ── Hook text — scale punch + fast fade ──────────────────────────────────
-  const hookOpacity = useFadeIn({
-    start: T.hook.start,
-    duration: HOOK_PEAK,
-    fadeOutStart: HOOK_HOLD,
-    fadeOutDuration: T.hook.duration - HOOK_HOLD,
-  });
+  const hookOpacity = interpolate(
+    frame,
+    [T.hook.start, T.hook.start + HOOK_PEAK, HOOK_HOLD, T.hook.duration],
+    [0, 1, 1, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
   const hookY = interpolate(frame, [T.hook.start, HOOK_PEAK], [48, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
@@ -69,17 +78,29 @@ export const MyComposition: React.FC<CompositionProps> = ({
   });
 
   // Sub-text — staggered +5 frames
-  const subOpacity = useFadeIn({
-    start: T.hook.start + 5,
-    duration: 9,
-    fadeOutStart: HOOK_HOLD,
-    fadeOutDuration: T.hook.duration - HOOK_HOLD,
-  });
+  const subOpacity = interpolate(
+    frame,
+    [T.hook.start + 5, T.hook.start + 14, HOOK_HOLD, T.hook.duration],
+    [0, 1, 1, 0],
+    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+  );
   const subY = interpolate(frame, [T.hook.start + 5, HOOK_PEAK + 5], [26, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
     easing: Easing.out(Easing.cubic),
   });
+
+  // ── Slide out to left at end of screen 1 ─────────────────────────────────
+  const slideOutX = interpolate(
+    frame,
+    [T.screen1.start + 94, T.screen1.start + 114],
+    [0, -860],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+      easing: Easing.in(Easing.cubic),
+    }
+  );
 
   // ── Flash on phone arrival ────────────────────────────────────────────────
   const flashOpacity = interpolate(
@@ -95,19 +116,6 @@ export const MyComposition: React.FC<CompositionProps> = ({
     extrapolateRight: "clamp",
     easing: Easing.bezier(0.22, 1, 0.36, 1),
   });
-
-  // ── CTA — spring bounce ───────────────────────────────────────────────────
-  const ctaProgress = spring({
-    frame: frame - CTA_START,
-    fps,
-    config: { damping: 9, stiffness: 210, mass: 0.75 },
-  });
-  const ctaScale   = interpolate(ctaProgress, [0, 1], [0.6, 1]);
-  const ctaOpacity = interpolate(frame, [CTA_START, CTA_START + 6], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const ctaY = interpolate(ctaProgress, [0, 1], [28, 0]);
 
   return (
     <AbsoluteFill
@@ -161,17 +169,15 @@ export const MyComposition: React.FC<CompositionProps> = ({
         </div>
       </AbsoluteFill>
 
-      {/* ════ PHONE + CTA ════ */}
+      {/* ════ PHONE ════ */}
       <AbsoluteFill
         style={{
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: 40,
+          transform: `translateX(${slideOutX}px)`,
         }}
       >
-        {/* Zoom wrapper */}
         <div style={{ transform: `scale(${zoomScale})`, transformOrigin: "center center" }}>
           <PhoneEntrance variant="perspectiveLeft" delay={PHONE_IN}>
             <Img
@@ -184,32 +190,6 @@ export const MyComposition: React.FC<CompositionProps> = ({
             />
           </PhoneEntrance>
         </div>
-
-        {/* CTA — spring bounce */}
-        <div
-          style={{
-            opacity: ctaOpacity,
-            transform: `scale(${ctaScale}) translateY(${ctaY}px)`,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 10,
-            direction: "rtl",
-          }}
-        >
-          <svg width="48" height="40" viewBox="0 0 48 40">
-            <path
-              d="M 24 36 L 24 6 M 24 6 L 12 18 M 24 6 L 36 18"
-              stroke={BRAND.blueL}
-              strokeWidth="3"
-              strokeLinecap="round"
-              fill="none"
-            />
-          </svg>
-          <div style={{ color: BRAND.blueL, fontSize: 34, fontWeight: 700, whiteSpace: "nowrap" }}>
-            {ctaText}
-          </div>
-        </div>
       </AbsoluteFill>
 
       {/* ════ FLASH on phone arrival ════ */}
@@ -218,7 +198,7 @@ export const MyComposition: React.FC<CompositionProps> = ({
       />
 
       {/* ════ SCREEN 2 ════ */}
-      <Sequence from={T.screen2.start} durationInFrames={T.screen2.duration}>
+      <Sequence from={T.screen2.start - SPEED_SAVINGS} durationInFrames={T.screen2.duration}>
         <AbsoluteFill
           style={{
             display: "flex",
@@ -227,8 +207,9 @@ export const MyComposition: React.FC<CompositionProps> = ({
             background: BRAND.bg,
           }}
         >
+          <div style={{ transform: "scale(1.28)", transformOrigin: "center center" }}>
           <Screen2
-            startAt={T.screen2.start}
+            startAt={0}
             images={[
               "screen-2-form-1.jpeg",
               "screen-2-form-2.jpeg",
@@ -236,6 +217,7 @@ export const MyComposition: React.FC<CompositionProps> = ({
               "screen-2-form-4.jpeg",
             ]}
           />
+          </div>
         </AbsoluteFill>
       </Sequence>
     </AbsoluteFill>

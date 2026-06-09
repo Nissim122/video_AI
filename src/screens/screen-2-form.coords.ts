@@ -11,12 +11,12 @@ export type { ScreenRegion };
 export const SCREEN_2_FORM: Record<string, ScreenRegion> = {
 
   // ── עמוד 1 — Monday (CRM), Pipedrive (CRM), ריווחית (Finance) ─────────────
-  item_a_p1: { top: "30%", left: "7%",  width: "14%", height: "6%" }, // Monday
-  item_b_p1: { top: "30%", left: "55%", width: "14%", height: "6%" }, // Pipedrive
-  item_c_p1: { top: "65%", left: "55%", width: "14%", height: "6%" }, // ריווחית
+  item_a_p1: { top: "32%", left: "7%",  width: "14%", height: "6%" }, // Monday
+  item_b_p1: { top: "32%", left: "55%", width: "14%", height: "6%" }, // Pipedrive
+  item_c_p1: { top: "62.5%", left: "55%", width: "14%", height: "6%" }, // ריווחית
 
   // ── עמוד 2 — Slack (Chat), Calendly (Scheduling), Notion (Projects) ───────
-  item_a_p2: { top: "15%", left: "7%",  width: "14%", height: "6%" }, // Slack
+  item_a_p2: { top: "16%", left: "6%",  width: "14%", height: "6%" }, // Slack
   item_b_p2: { top: "48%", left: "79%", width: "14%", height: "6%" }, // Calendly
   item_c_p2: { top: "64%", left: "55%", width: "14%", height: "6%" }, // Notion
 

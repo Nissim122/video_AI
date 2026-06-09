@@ -13,6 +13,12 @@ interface GlowHighlightProps {
   shape?: "rect" | "circle";
   /** if set, fade out over the last 10 frames before startAt + duration */
   duration?: number;
+  /** how many frames to fade in (default 14) */
+  fadeInFrames?: number;
+  /** absolute frame at which fade-out should be complete (overrides duration) */
+  fadeOutAt?: number;
+  /** how many frames the fade-out takes when using fadeOutAt (default 6) */
+  fadeOutFrames?: number;
 }
 
 export const GlowHighlight: React.FC<GlowHighlightProps> = ({
@@ -22,15 +28,23 @@ export const GlowHighlight: React.FC<GlowHighlightProps> = ({
   badge = true,
   shape = "rect",
   duration,
+  fadeInFrames = 14,
+  fadeOutAt,
+  fadeOutFrames = 6,
 }) => {
   const frame = useCurrentFrame();
 
-  const opacity = interpolate(frame, [startAt, startAt + 14], [0, 1], {
+  const opacity = interpolate(frame, [startAt, startAt + fadeInFrames], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
   const fadeOut =
-    duration !== undefined
+    fadeOutAt !== undefined
+      ? interpolate(frame, [fadeOutAt - fadeOutFrames, fadeOutAt], [1, 0], {
+          extrapolateLeft: "clamp",
+          extrapolateRight: "clamp",
+        })
+      : duration !== undefined
       ? interpolate(frame, [startAt + duration - 10, startAt + duration], [1, 0], {
           extrapolateLeft: "clamp",
           extrapolateRight: "clamp",
@@ -48,11 +62,11 @@ export const GlowHighlight: React.FC<GlowHighlightProps> = ({
         width: pos.width,
         height: pos.height,
         borderRadius: shape === "circle" ? "50%" : 16,
-        background: `${color}${Math.round(0.18 * combinedOpacity * 255).toString(16).padStart(2, "0")}`,
-        border: `3px solid ${color}`,
+        background: `${color}${Math.round((shape === "circle" ? 0.28 : 0.18) * combinedOpacity * 255).toString(16).padStart(2, "0")}`,
+        border: `${shape === "circle" ? 4 : 3}px solid ${color}`,
         boxShadow: `
-          0 0 0 6px ${color}${Math.round(0.18 * combinedOpacity * pulse * 255).toString(16).padStart(2, "0")},
-          0 0 32px ${color}${Math.round(0.55 * combinedOpacity * pulse * 255).toString(16).padStart(2, "0")}
+          0 0 0 ${shape === "circle" ? 8 : 6}px ${color}${Math.round(0.25 * combinedOpacity * pulse * 255).toString(16).padStart(2, "0")},
+          0 0 ${shape === "circle" ? 48 : 32}px ${color}${Math.round(0.7 * combinedOpacity * pulse * 255).toString(16).padStart(2, "0")}
         `,
         opacity: combinedOpacity,
         pointerEvents: "none",

@@ -2,7 +2,7 @@ import React from "react";
 import { useCurrentFrame, useVideoConfig, spring, interpolate } from "remotion";
 import { IPhone14 } from "./IPhone14";
 
-export type PhoneVariant = "slideUp" | "perspectiveLeft" | "floatIn" | "dropBounce";
+export type PhoneVariant = "slideUp" | "perspectiveLeft" | "floatIn" | "dropBounce" | "slideFromRight";
 
 interface PhoneEntranceProps {
   /** Animation style */
@@ -11,6 +11,8 @@ interface PhoneEntranceProps {
   delay?: number;
   /** Screen content rendered inside the phone */
   children?: React.ReactNode;
+  /** Override useCurrentFrame() — pass a remapped frame when using speed sections */
+  frame?: number;
 }
 
 const SPRING_CONFIGS: Record<PhoneVariant, { damping: number; mass: number; stiffness: number }> = {
@@ -22,14 +24,18 @@ const SPRING_CONFIGS: Record<PhoneVariant, { damping: number; mass: number; stif
   floatIn: { damping: 22, mass: 0.7, stiffness: 90 },
   // Falls from above with elastic bounce — high-energy
   dropBounce: { damping: 7, mass: 1.0, stiffness: 220 },
+  // Slides in from right — horizontal page transition
+  slideFromRight: { damping: 20, mass: 0.85, stiffness: 160 },
 };
 
 export const PhoneEntrance: React.FC<PhoneEntranceProps> = ({
   variant,
   delay = 0,
   children,
+  frame: frameProp,
 }) => {
-  const frame = useCurrentFrame();
+  const rawFrame = useCurrentFrame();
+  const frame = frameProp ?? rawFrame;
   const { fps } = useVideoConfig();
 
   const f = Math.max(0, frame - delay);
@@ -71,6 +77,11 @@ export const PhoneEntrance: React.FC<PhoneEntranceProps> = ({
     case "dropBounce": {
       const y = interpolate(progress, [0, 1], [-1100, 0]);
       transform = `translateY(${y}px)`;
+      break;
+    }
+    case "slideFromRight": {
+      const x = interpolate(progress, [0, 1], [820, 0]);
+      transform = `translateX(${x}px)`;
       break;
     }
   }
