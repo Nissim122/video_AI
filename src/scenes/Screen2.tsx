@@ -35,20 +35,29 @@ export const Screen2: React.FC<Screen2Props> = ({ startAt, images }) => {
     extrapolateRight: "clamp",
   });
 
-  // ── Scroll: 3 independent springs summed → natural iOS overshoot ──────────
-  // Each spring activates when its PAUSE_*_END frame is reached.
-  // They're additive: s1 takes page 1→2, s2 takes 2→3, s3 takes 3→4.
+  // ── Scrolling strip with 10% overlap ─────────────────────────────────────
+  // Images are stacked with 90% spacing (each covers 10% of the one above).
+  // A single globalScroll moves all images together as a unit.
   const s1 = spring({ frame: f - PAUSE_1_END, fps, config: SCROLL_SPRING });
   const s2 = spring({ frame: f - PAUSE_2_END, fps, config: SCROLL_SPRING });
   const s3 = spring({ frame: f - PAUSE_3_END, fps, config: SCROLL_SPRING });
-  const scrollY = -(s1 + s2 + s3) * STRIP_PAGE_H;
+
+  const STEP = STRIP_PAGE_H * 0.95; // 5% overlap between consecutive images
+  const globalScroll = -(s1 + s2 + s3) * STEP;
+
+  const scrollYs = [
+    globalScroll,
+    globalScroll + STEP,
+    globalScroll + STEP * 2,
+    globalScroll + STEP * 3,
+  ];
 
   const onPage4 = f >= SCROLL_3_END;
 
   return (
     <div style={{ opacity: phoneOpacity }}>
       <PhoneEntrance variant="slideFromRight" delay={startAt}>
-        <ScrollingPhoneScreen images={images} scrollY={scrollY} topCrops={[70, 70, 70, 70]} bottomCrops={[100, 100, 100, 100]}>
+        <ScrollingPhoneScreen images={images} scrollYs={scrollYs} topCrops={[70, 70, 70, 70]} bottomCrops={[180, 180, 180, 180]}>
 
           {/* ━━ PAGE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */}
           <GlowHighlight pos={SCREEN_2_FORM.item_a_p1} startAt={startAt + 4}  shape="circle" fadeInFrames={4} fadeOutAt={startAt + PAUSE_1_END} />
