@@ -224,7 +224,7 @@ export const MyComposition: React.FC<CompositionProps> = ({
             background: BRAND.bg,
           }}
         >
-          <div style={{ transform: "scale(1.28)", transformOrigin: "center center" }}>
+          <div style={{ transform: "scale(1.024)", transformOrigin: "center center" }}>
             <ScannerTransition />
           </div>
         </AbsoluteFill>
