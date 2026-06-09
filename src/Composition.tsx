@@ -17,6 +17,7 @@ import { GlowHighlight } from "./components/GlowHighlight";
 import { SCREEN_1_PAIN } from "./screens/screen-1-pain.coords";
 import { T } from "./scenes/timeline";
 import { Screen2 } from "./scenes/Screen2";
+import { ScannerTransition } from "./scenes/ScannerTransition";
 
 const { fontFamily } = loadFont();
 
@@ -209,6 +210,22 @@ export const MyComposition: React.FC<CompositionProps> = ({
         >
           <div style={{ transform: "scale(1.28)", transformOrigin: "center center" }}>
           <Screen2 startAt={0} />
+          </div>
+        </AbsoluteFill>
+      </Sequence>
+
+      {/* ════ SCANNER TRANSITION ════ */}
+      <Sequence from={T.scannerTransition.start - SPEED_SAVINGS} durationInFrames={T.scannerTransition.duration}>
+        <AbsoluteFill
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: BRAND.bg,
+          }}
+        >
+          <div style={{ transform: "scale(1.28)", transformOrigin: "center center" }}>
+            <ScannerTransition />
           </div>
         </AbsoluteFill>
       </Sequence>
