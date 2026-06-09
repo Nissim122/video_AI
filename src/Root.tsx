@@ -84,9 +84,9 @@ export const RemotionRoot: React.FC = () => {
         height={1920}
         schema={CompositionSchema}
         defaultProps={{
-          hookText: "כמה שעות בשבוע אתה מבזבז על עבודה שחוזרת על עצמה?",
-          subText: "פולואפים, תיאומים, דוחות, שיווק...",
-          ctaText: "בחר מה מפריע לך",
+          hookText: "בניתי כלי שמוצא אוטומציות לעסק שלך בפחות מדקה",
+          subText: "לידים, פולואפים, הצעות מחיר, תזכורות...",
+          ctaText: "",
           screenImage: "screen-1-pain.jpeg",
         }}
       />
