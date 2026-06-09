@@ -1,126 +1,89 @@
 import React from "react";
-import { useCurrentFrame, useVideoConfig, spring, interpolate } from "remotion";
+import { interpolate, Easing } from "remotion";
 import { BRAND } from "../brand";
-import { HandPointer, SkinTone } from "./HandPointer";
 
 interface ScrollGestureProps {
+  frame: number;
+  imageY: number;
+  imageX: number;
+  size?: number;
   startAt: number;
-  direction?: "up" | "down";
-  /** horizontal position as % of screen width (default "50%") */
-  x?: string;
-  /** vertical center of the gesture as % of screen height (default "60%") */
-  y?: string;
-  skinTone?: SkinTone;
+  duration?: number;
+  swipeDistance?: number;
+  color?: string;
 }
 
-// HandPointer at size=80
-const HAND_W = 80;
-const HAND_H = 80 * 1.94; // ≈ 155px
-
 export const ScrollGesture: React.FC<ScrollGestureProps> = ({
+  frame,
+  imageY,
+  imageX,
+  size = 78,
   startAt,
-  direction = "up",
-  x = "50%",
-  y = "60%",
-  skinTone = "light",
+  duration = 36,
+  swipeDistance = 200,
+  color = BRAND.blue,
 }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const f = frame - startAt;
 
-  const DURATION = 28;
+  const fadeInEnd = Math.min(6, Math.floor(duration * 0.3));
+  const fadeOutStart = Math.max(fadeInEnd + 1, duration - 6);
 
-  const handOpacity = interpolate(frame, [startAt, startAt + 8], [0, 1], {
+  const opacity = interpolate(f, [0, fadeInEnd, fadeOutStart, duration], [0, 1, 1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
-  const slideProgress = spring({
-    frame: frame - startAt,
-    fps,
-    config: { damping: 22, mass: 1.1, stiffness: 90 },
+  const swipeProgress = interpolate(f, [fadeInEnd, fadeOutStart], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
+    easing: Easing.bezier(0.42, 0, 0.58, 1),
   });
 
-  const travelPx = 120;
-  const travel = interpolate(
-    slideProgress,
-    [0, 1],
-    [0, direction === "up" ? -travelPx : travelPx]
-  );
+  if (opacity <= 0) return null;
 
-  const gestureOpacity = interpolate(
-    frame,
-    [startAt + DURATION, startAt + DURATION + 10],
-    [1, 0],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-  );
+  const hex2 = (v: number) =>
+    Math.round(v * 255).toString(16).padStart(2, "0");
 
-  // Trail dots trailing behind the finger
-  const trailCount = 3;
+  const r = size / 2;
+  const circleOffsetY = swipeDistance * swipeProgress;
+  const pulse = 0.7 + Math.sin(f * 0.22) * 0.3;
 
   return (
     <div
       style={{
         position: "absolute",
-        top: y,
-        left: x,
-        // Center on the fingertip position (fingertip = bottom-center of hand SVG)
-        marginLeft: -(HAND_W / 2) + 1,
-        marginTop: -HAND_H,
-        opacity: gestureOpacity,
+        top: imageY,
+        left: imageX,
         pointerEvents: "none",
+        transform: "rotate(180deg)",
       }}
     >
-      {/* Trail dots behind the fingertip */}
-      {Array.from({ length: trailCount }).map((_, i) => {
-        const trailDelay = (i + 1) * 6;
-        const trailProgress = spring({
-          frame: frame - startAt - trailDelay,
-          fps,
-          config: { damping: 22, mass: 1.1, stiffness: 90 },
-        });
-        const trailTravel = interpolate(
-          trailProgress,
-          [0, 1],
-          [0, direction === "up" ? -travelPx : travelPx]
-        );
-        const trailOpacity = interpolate(
-          frame,
-          [startAt + trailDelay, startAt + trailDelay + 6],
-          [0, 0.35 - i * 0.1],
-          { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-        );
-
-        return (
-          <div
-            key={i}
-            style={{
-              position: "absolute",
-              // dots follow the fingertip (bottom center of SVG)
-              top: HAND_H,
-              left: HAND_W / 2,
-              width: 18,
-              height: 18,
-              marginTop: -9,
-              marginLeft: -9,
-              borderRadius: "50%",
-              background: BRAND.blueL,
-              opacity: trailOpacity,
-              transform: `translateY(${trailTravel}px)`,
-            }}
-          />
-        );
-      })}
-
-      {/* Hand */}
       <div
         style={{
-          opacity: handOpacity,
-          transform: `translateY(${travel}px)`,
-          filter: "drop-shadow(0 4px 14px rgba(0,0,0,0.5))",
+          position: "absolute",
+          top: r,
+          left: r - 2,
+          width: 4,
+          height: swipeDistance * swipeProgress,
+          background: `linear-gradient(to bottom, ${color}, transparent)`,
+          opacity: opacity * 0.55,
+          borderRadius: 2,
         }}
-      >
-        <HandPointer pressProgress={0.3} skinTone={skinTone} size={HAND_W} />
-      </div>
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: circleOffsetY,
+          left: 0,
+          width: size,
+          height: size,
+          borderRadius: "50%",
+          background: `${color}${hex2(0.28 * opacity)}`,
+          border: `4px solid ${color}`,
+          boxShadow: `0 0 0 8px ${color}${hex2(0.25 * opacity * pulse)}, 0 0 48px ${color}${hex2(0.7 * opacity * pulse)}`,
+          opacity,
+        }}
+      />
     </div>
   );
 };
