@@ -9,35 +9,28 @@ const CROSSFADE = 5;          // smooth dissolve between frames
 export const SCANNER_DURATION = 80; // ~2.7s total
 
 // Returns opacity for image i at the current frame — dissolves in/out
+// Uses separate fade-in × fade-out to guarantee no duplicate keyframes.
 function imageOpacity(frame: number, i: number): number {
   const start = i * FRAMES_PER_IMAGE;
-  const fadeInStart = start - CROSSFADE; // may be negative for i=0
-  const fadeOutStart = start + FRAMES_PER_IMAGE - CROSSFADE;
-  const fadeOutEnd = start + FRAMES_PER_IMAGE;
+  const end = start + FRAMES_PER_IMAGE;
 
-  if (i === FRAMES_COUNT - 1) {
-    // Last frame: fade in and hold
-    if (fadeInStart >= start) return 1; // no fade-in needed
-    return interpolate(frame, [fadeInStart, start], [0, 1], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    });
-  }
+  // First frame has nothing before it — start fully visible
+  const fadeIn = i === 0
+    ? 1
+    : interpolate(frame, [start - CROSSFADE, start], [0, 1], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      });
 
-  if (fadeInStart >= start) {
-    // No room for fade-in (i=0 with CROSSFADE=0), just fade-out
-    return interpolate(frame, [fadeOutStart, fadeOutEnd], [1, 0], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    });
-  }
+  // Last frame holds indefinitely — overall exitOpacity handles the fade-out
+  const fadeOut = i === FRAMES_COUNT - 1
+    ? 1
+    : interpolate(frame, [end - CROSSFADE, end], [1, 0], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      });
 
-  return interpolate(
-    frame,
-    [fadeInStart, start, fadeOutStart, fadeOutEnd],
-    [0, 1, 1, 0],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
-  );
+  return fadeIn * fadeOut;
 }
 
 export const ScannerTransition: React.FC = () => {
