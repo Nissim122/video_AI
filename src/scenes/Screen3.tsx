@@ -218,7 +218,8 @@ export const Screen3: React.FC<Screen3Props> = ({ startAt = 0, logicalFrame }) =
             imageY={clickY}
             imageX={clickX}
             size={60}
-            startAt={245}
+            startAt={242}
+            fadeInFrames={2}
             duration={7}
           />
         </div>

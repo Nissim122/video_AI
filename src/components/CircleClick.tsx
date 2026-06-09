@@ -16,6 +16,8 @@ interface CircleClickProps {
   /** local frames the circle stays visible (fade-in + hold + fade-out) */
   duration: number;
   color?: string;
+  /** frames for fade-in (default 6) */
+  fadeInFrames?: number;
 }
 
 export const CircleClick: React.FC<CircleClickProps> = ({
@@ -26,8 +28,9 @@ export const CircleClick: React.FC<CircleClickProps> = ({
   startAt,
   duration,
   color = BRAND.blue,
+  fadeInFrames = 6,
 }) => {
-  const fadeIn = interpolate(frame, [startAt, startAt + 6], [0, 1], {
+  const fadeIn = interpolate(frame, [startAt, startAt + fadeInFrames], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });

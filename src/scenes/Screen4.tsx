@@ -1,11 +1,13 @@
 import React from "react";
 import {
   useCurrentFrame,
+  useVideoConfig,
+  spring,
   interpolate,
   staticFile,
   Img,
 } from "remotion";
-import { PhoneEntrance } from "../components/PhoneEntrance";
+import { IPhone14 } from "../components/IPhone14";
 import { BRAND } from "../brand";
 
 export const SCREEN4_DURATION = 90;
@@ -24,56 +26,71 @@ export const Screen4: React.FC<Screen4Props> = ({
 }) => {
   const rawFrame = useCurrentFrame();
   const frame = logicalFrame ?? rawFrame;
+  const { fps } = useVideoConfig();
   const f = Math.max(0, frame - startAt);
 
-  const phoneOpacity = interpolate(f, [0, 12], [0, 1], {
+  // iOS app-open animation — content scales up from center + fades in
+  const appOpenSpring = spring({
+    frame: f,
+    fps,
+    config: { damping: 22, stiffness: 200, mass: 0.6 },
+  });
+
+  const contentScale = interpolate(appOpenSpring, [0, 1], [0.88, 1]);
+  const contentOpacity = interpolate(f, [0, 8], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
   return (
-    <div style={{ opacity: phoneOpacity }}>
-      <PhoneEntrance variant="slideFromRight" delay={startAt} frame={logicalFrame}>
-        <div style={{ position: "absolute", inset: 0 }}>
-          <div style={{ position: "absolute", inset: 0, background: BRAND.bg }} />
+    <IPhone14>
+      <div style={{ position: "absolute", inset: 0, background: BRAND.bg }} />
 
-          {screen4Image ? (
-            <Img
-              src={staticFile(screen4Image)}
-              style={{
-                position: "absolute",
-                inset: 0,
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-            />
-          ) : (
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          transform: `scale(${contentScale})`,
+          transformOrigin: "center center",
+          opacity: contentOpacity,
+        }}
+      >
+        {screen4Image ? (
+          <Img
+            src={staticFile(screen4Image)}
+            style={{
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              background: BRAND.bgE,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
             <div
               style={{
-                position: "absolute",
-                inset: 0,
-                background: BRAND.bgE,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
+                color: BRAND.muted,
+                fontSize: 24,
+                textAlign: "center",
+                fontFamily: "Heebo, sans-serif",
+                direction: "rtl",
               }}
             >
-              <div
-                style={{
-                  color: BRAND.muted,
-                  fontSize: 24,
-                  textAlign: "center",
-                  fontFamily: "Heebo, sans-serif",
-                  direction: "rtl",
-                }}
-              >
-                צילום מסך ישנה כאן
-              </div>
+              צילום מסך ישנה כאן
             </div>
-          )}
-        </div>
-      </PhoneEntrance>
-    </div>
+          </div>
+        )}
+      </div>
+    </IPhone14>
   );
 };
