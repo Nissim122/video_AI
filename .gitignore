@@ -5,3 +5,6 @@ dist
 
 # Ignore the output video from Git but not videos you import into src/.
 out
+
+# Source frames (Remotion uses public/scanner-frames/ instead)
+scanner-animation-frames
