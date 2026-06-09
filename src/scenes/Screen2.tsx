@@ -9,13 +9,13 @@ const PAUSE_2_END = 55;
 const PAUSE_3_END = 82;
 export const SCREEN2_DURATION = 145;
 
-// Fast spring: settles in ~18 frames
 const SCROLL_SPRING = { damping: 22, stiffness: 260, mass: 0.7 };
 
 // image: 1170×7479 → rendered at width 548 → height ≈ 3503px
-// container height = 1290px (screen 1220 + top:-70 offset)
-// max scroll = 3503 - 1290 = 2213px → 3 steps × 720px (slight margin)
-const SCROLL_STEP = 720;
+// IPhone14 hides first 70px (top:-70). TOP_CROP adds extra to hide the Clix banner.
+// max scroll = 3503 - 1290 - TOP_CROP = 2213 → 3 steps × 724px
+const TOP_CROP = 64; // +24px (~2% of PHONE_H)
+const SCROLL_STEP = 724;
 
 interface Screen2Props {
   startAt: number;
@@ -35,7 +35,7 @@ export const Screen2: React.FC<Screen2Props> = ({ startAt }) => {
   const s2 = spring({ frame: f - PAUSE_2_END, fps, config: SCROLL_SPRING });
   const s3 = spring({ frame: f - PAUSE_3_END, fps, config: SCROLL_SPRING });
 
-  const scrollY = -(s1 + s2 + s3) * SCROLL_STEP;
+  const scrollY = -(s1 + s2 + s3) * SCROLL_STEP - TOP_CROP;
 
   return (
     <div style={{ opacity: phoneOpacity }}>
