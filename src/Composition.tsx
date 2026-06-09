@@ -18,6 +18,7 @@ import { T } from "./scenes/timeline";
 import { Screen2 } from "./scenes/Screen2";
 import { ScannerTransition } from "./scenes/ScannerTransition";
 import { Screen3 } from "./scenes/Screen3";
+import { Screen4 } from "./scenes/Screen4";
 
 const { fontFamily } = loadFont();
 
@@ -32,24 +33,34 @@ export type CompositionProps = z.infer<typeof CompositionSchema>;
 
 // ── Speed sections (raw output frame ranges) ─────────────────────────────────
 // Section 1: raw 30–45   → logical 30–60   (2×, saves 15 frames)
-// Section 2: raw 210–240 → logical 225–285 (2×, saves 30 frames)
-export const SPEED_SAVINGS = 45; // total saved output frames
+// Section 2: raw 95–120  → logical 110–185 (3×, saves 50 frames)
+// Section 3: raw 180–195 → logical 245–290 (3×, saves 30 frames) [screen2 local 95–110]
+// Section 4: raw 210–240 → logical 305–365 (2×, saves 30 frames)
+export const SPEED_SAVINGS = 125; // total saved output frames
 
 function remapFrame(raw: number): number {
-  if (raw <= 30)  return raw;
-  if (raw <= 45)  return 30 + (raw - 30) * 2;
-  if (raw < 210)  return raw + 15;
-  if (raw <= 240) return 225 + (raw - 210) * 2;
-  return raw + 45;
+  if (raw <= 30)   return raw;
+  if (raw <= 45)   return 30 + (raw - 30) * 2;
+  if (raw < 95)    return raw + 15;
+  if (raw <= 120)  return 110 + (raw - 95) * 3;
+  if (raw < 180)   return raw + 65;
+  if (raw <= 195)  return 245 + (raw - 180) * 3;
+  if (raw < 210)   return raw + 95;
+  if (raw <= 240)  return 305 + (raw - 210) * 2;
+  return raw + 125;
 }
 
 // Inverse of remapFrame — logical → raw (used for Sequence from/duration)
 function logicalToRaw(logical: number): number {
-  if (logical <= 30)  return logical;
-  if (logical <= 60)  return 30 + (logical - 30) / 2;
-  if (logical < 225)  return logical - 15;
-  if (logical <= 285) return 210 + (logical - 225) / 2;
-  return logical - 45;
+  if (logical <= 30)   return logical;
+  if (logical <= 60)   return 30 + (logical - 30) / 2;
+  if (logical < 110)   return logical - 15;
+  if (logical <= 185)  return 95 + (logical - 110) / 3;
+  if (logical < 245)   return logical - 65;
+  if (logical <= 290)  return 180 + (logical - 245) / 3;
+  if (logical < 305)   return logical - 95;
+  if (logical <= 365)  return 210 + (logical - 305) / 2;
+  return logical - 125;
 }
 
 // ── Timings ───────────────────────────────────────────────────────────────────
@@ -262,6 +273,25 @@ export const MyComposition: React.FC<CompositionProps> = ({
         >
           <div style={{ transform: "scale(1.28)", transformOrigin: "center center" }}>
             <Screen3 startAt={T.screen3.start} logicalFrame={frame} />
+          </div>
+        </AbsoluteFill>
+      </Sequence>
+
+      {/* ════ SCREEN 4 — Email notification ════ */}
+      <Sequence
+        from={logicalToRaw(T.screen4.start)}
+        durationInFrames={logicalToRaw(T.screen4.end) - logicalToRaw(T.screen4.start)}
+      >
+        <AbsoluteFill
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: BRAND.bg,
+          }}
+        >
+          <div style={{ transform: "scale(1.28)", transformOrigin: "center center" }}>
+            <Screen4 startAt={T.screen4.start} logicalFrame={frame} />
           </div>
         </AbsoluteFill>
       </Sequence>

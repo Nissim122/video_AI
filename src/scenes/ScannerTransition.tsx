@@ -3,21 +3,21 @@ import { useCurrentFrame, interpolate, Img, staticFile } from "remotion";
 import { PhoneEntrance } from "../components/PhoneEntrance";
 
 const FRAMES_COUNT = 8;
-const FRAMES_PER_IMAGE = 6; // each still shown for 6 Remotion frames → 0.2s at 30fps
+const FRAMES_PER_IMAGE = 10; // 8×10 = 80 → exact cycle, ~33% slower
 
-export const SCANNER_DURATION = 60; // 2 seconds total
+export const SCANNER_DURATION = 80; // 8 frames × 10 = one full cycle, ends on last frame
 
 export const ScannerTransition: React.FC = () => {
   const frame = useCurrentFrame();
 
-  const enterOpacity = interpolate(frame, [0, 12], [0, 1], {
+  const enterOpacity = interpolate(frame, [0, 16], [0, 1], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
   const exitOpacity = interpolate(
     frame,
-    [SCANNER_DURATION - 14, SCANNER_DURATION - 2],
+    [SCANNER_DURATION - 18, SCANNER_DURATION - 3],
     [1, 0],
     { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
   );
