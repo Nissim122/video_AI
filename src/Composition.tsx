@@ -259,7 +259,7 @@ export const MyComposition: React.FC<CompositionProps> = ({
         }}
       >
         <div style={{ transform: `scale(${zoomScale})`, transformOrigin: "center center" }}>
-          <PhoneEntrance variant="perspectiveLeft" delay={PHONE_IN}>
+          <PhoneEntrance variant="perspectiveLeft" delay={PHONE_IN} frame={frame}>
             <Img
               src={staticFile(screenImage)}
               style={{ width: "100%", height: "100%", objectFit: "cover" }}
