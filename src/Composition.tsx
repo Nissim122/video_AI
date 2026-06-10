@@ -66,7 +66,7 @@ function logicalToRaw(logical: number): number {
 
 // ── Timings ───────────────────────────────────────────────────────────────────
 const HOOK_PEAK  = 10;                          // fast punch (was 18)
-const HOOK_HOLD  = 20;                          // short hold (was 32)
+const HOOK_HOLD  = 100;                         // hold until frame 100
 
 const PHONE_IN   = T.screen1.start;             // 36 — enters immediately
 const ZOOM_START = T.screen1.start + 26;        // 62
