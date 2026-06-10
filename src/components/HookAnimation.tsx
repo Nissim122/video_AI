@@ -13,12 +13,13 @@ const P2_END = 30;
 const P3_START = 28;
 
 const ICONS = [
-  { id: "leads",    x: 140,  y: 290,  label: "לידים",    color: BRAND.blueL },
-  { id: "popup",    x: 940,  y: 320,  label: "פולאפים",  color: BRAND.pink  },
-  { id: "email",    x: 82,   y: 720,  label: "מיילים",   color: BRAND.blueL },
-  { id: "reminder", x: 998,  y: 680,  label: "תזכורות",  color: BRAND.blueL },
-  { id: "chat",     x: 165,  y: 1440, label: "וואטסאפ",  color: BRAND.pink  },
-  { id: "crm",      x: 918,  y: 1420, label: "CRM",      color: BRAND.pink  },
+  { id: "leads",    x: 195,  y: 671,  label: "לידים",    color: BRAND.blueL },
+  { id: "popup",    x: 885,  y: 671,  label: "פולאפים",  color: BRAND.pink  },
+  { id: "email",    x: 405,  y: 726,  label: "מיילים",   color: BRAND.blueL },
+  { id: "reminder", x: 675,  y: 726,  label: "תזכורות",  color: BRAND.blueL },
+  { id: "chat",     x: 218,  y: 1230, label: "וואטסאפ",  color: BRAND.pink  },
+  { id: "crm",      x: 862,  y: 1230, label: "CRM",      color: BRAND.pink  },
+  { id: "calendar", x: 342,  y: 1505, label: "יומן",     color: BRAND.blueL },
 ] as const;
 
 type IconId = typeof ICONS[number]["id"];
@@ -56,6 +57,33 @@ function IconShape({ id, color }: { id: IconId; color: string }) {
         <rect x="4" y="-24" width="20" height="20" rx="3" fill={color} />
         <rect x="4" y="4" width="20" height="20" rx="3" fill={color} />
       </>;
+    case "trigger":
+      return <path d="M 6,-24 L -8,4 L 2,4 L -6,24 L 10,-4 L 0,-4 Z" fill={color} />;
+    case "calendar":
+      return <>
+        <rect x="-22" y="-20" width="44" height="42" rx="4" fill="none" stroke={color} strokeWidth="2.5" />
+        <line x1="-22" y1="-6" x2="22" y2="-6" stroke={color} strokeWidth="2" />
+        <rect x="-9" y="-26" width="6" height="10" rx="2" fill={color} />
+        <rect x="3" y="-26" width="6" height="10" rx="2" fill={color} />
+        <circle cx="-11" cy="8" r="3" fill={color} />
+        <circle cx="0" cy="8" r="3" fill={color} />
+        <circle cx="11" cy="8" r="3" fill={color} />
+        <circle cx="-11" cy="18" r="3" fill={color} />
+        <circle cx="0" cy="18" r="3" fill={color} />
+      </>;
+    case "chart":
+      return <>
+        <rect x="-22" y="2" width="11" height="14" rx="2" fill={color} />
+        <rect x="-6" y="-18" width="11" height="34" rx="2" fill={color} />
+        <rect x="10" y="-8" width="11" height="24" rx="2" fill={color} />
+        <line x1="-26" y1="16" x2="26" y2="16" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
+      </>;
+    case "webhook":
+      return <>
+        <polyline points="-22,-16 -10,0 -22,16" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+        <line x1="5" y1="-20" x2="-5" y2="20" stroke={color} strokeWidth="3" strokeLinecap="round" />
+        <polyline points="10,-16 22,0 10,16" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      </>;
   }
 }
 
@@ -90,7 +118,7 @@ export const HookAnimation: React.FC<HookAnimationProps> = ({ f }) => {
       width="1080"
       height="1920"
       viewBox="0 0 1080 1920"
-      style={{ position: "absolute", inset: 0, pointerEvents: "none", transform: "scale(0.5) translateY(1170px)", transformOrigin: "center center" }}
+      style={{ position: "absolute", inset: 0, pointerEvents: "none", transform: "scale(0.7) translateY(640px)", transformOrigin: "center center" }}
     >
       {/* ── Phase 3: connection lines (behind icons) ── */}
       {ICONS.map((icon, i) => {
@@ -127,25 +155,33 @@ export const HookAnimation: React.FC<HookAnimationProps> = ({ f }) => {
 
         return (
           <g key={icon.id} transform={`translate(${icon.x}, ${icon.y}) scale(${scale})`}>
-            {/* Glow ring when lit */}
-            {litOp > 0 && <circle r="52" fill={icon.color} opacity={0.14 * litOp} />}
-            {/* Gray state */}
-            <g opacity={(1 - litOp) * grayOp}>
+            {/* Outer glow ring when lit */}
+            {litOp > 0 && <circle r="132" fill={icon.color} opacity={0.12 * litOp} />}
+            {/* Background circle — always visible once appeared */}
+            <circle
+              r="102"
+              fill={BRAND.bgF}
+              stroke={litOp > 0 ? icon.color : "#374151"}
+              strokeWidth={2.5}
+              opacity={Math.max(grayOp * 2, litOp)}
+            />
+            {/* Gray state icon */}
+            <g opacity={(1 - litOp) * grayOp * 3}>
               <IconShape id={icon.id} color="#6b7280" />
             </g>
-            {/* Lit state */}
+            {/* Lit state icon */}
             <g opacity={litOp}>
               <IconShape id={icon.id} color={icon.color} />
             </g>
             {/* Label */}
             <text
-              y="46"
+              y="128"
               textAnchor="middle"
-              fontSize="27"
+              fontSize="32"
               fontFamily="Heebo, sans-serif"
-              fontWeight="600"
-              fill={litOp > 0.5 ? icon.color : "#555"}
-              opacity={Math.max(grayOp, litOp) * 0.85}
+              fontWeight="700"
+              fill={litOp > 0.5 ? icon.color : "#6b7280"}
+              opacity={Math.max(grayOp * 2.5, litOp)}
             >
               {icon.label}
             </text>

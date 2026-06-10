@@ -214,6 +214,7 @@ export const MyComposition: React.FC<CompositionProps> = ({
           gap: 22,
           padding: "0 80px",
           pointerEvents: "none",
+          transform: "translateY(-15%)",
         }}
       >
         <div
@@ -230,7 +231,7 @@ export const MyComposition: React.FC<CompositionProps> = ({
         >
           {hookText.includes("בפחות מדקה") ? (
             <>
-              {hookText.replace("בפחות מדקה", "")}
+              {hookText.replace(" בפחות מדקה", "")}{" "}
               <span style={{ color: BRAND.pink }}>בפחות מדקה</span>
             </>
           ) : hookText}
