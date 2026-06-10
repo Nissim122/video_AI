@@ -4,14 +4,17 @@ import {
   useVideoConfig,
   spring,
   interpolate,
+  Easing,
 } from "remotion";
 import { IPhone14 } from "../components/IPhone14";
+import { ScrollGesture } from "../components/ScrollGesture";
 import { EMAIL_HTML } from "./emailHtml";
 
-export const SCREEN4_DURATION = 20; // 6 seconds to scroll through email
+export const SCREEN4_DURATION = 50;
 
-// Scale email (designed at 600px) to fit phone inner width (548px)
 const EMAIL_SCALE = 548 / 600;
+const SCROLL_START = 13;
+const MAX_SCROLL = 500;
 
 interface Screen4Props {
   startAt?: number;
@@ -39,11 +42,20 @@ export const Screen4: React.FC<Screen4Props> = ({
     extrapolateRight: "clamp",
   });
 
-  const scrollY = 160;
+  // Scroll — same easing as Screen3, conservative range
+  const scrollY = interpolate(
+    f,
+    [SCROLL_START, SCREEN4_DURATION - 5],
+    [160, 160 - MAX_SCROLL],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+      easing: Easing.bezier(0.42, 0, 0.58, 1),
+    }
+  );
 
   return (
     <IPhone14>
-      {/* Dark email background */}
       <div style={{ position: "absolute", inset: 0, background: "#080e1c" }} />
 
       {/* iOS app-open animation wrapper */}
@@ -70,6 +82,15 @@ export const Screen4: React.FC<Screen4Props> = ({
             direction: "rtl",
           }}
           dangerouslySetInnerHTML={{ __html: EMAIL_HTML }}
+        />
+
+        {/* Scroll gesture overlay — same position as Screen3 */}
+        <ScrollGesture
+          frame={f}
+          imageY={800}
+          imageX={493}
+          startAt={SCROLL_START}
+          duration={40}
         />
       </div>
     </IPhone14>

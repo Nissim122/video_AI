@@ -4,10 +4,10 @@ import { PhoneEntrance } from "../components/PhoneEntrance";
 import { CircleClick } from "../components/CircleClick";
 
 // ── Timing (frames relative to scene start) ────────────────────────────────
-const PAUSE_1_END = 28;
-const PAUSE_2_END = 55;
-const PAUSE_3_END = 82;
-export const SCREEN2_DURATION = 145;
+const PAUSE_1_END = 38;
+const PAUSE_2_END = 74;
+const PAUSE_3_END = 111;
+export const SCREEN2_DURATION = 196;
 
 const SCROLL_SPRING = { damping: 22, stiffness: 260, mass: 0.7 };
 
@@ -33,15 +33,15 @@ const CLICKS: Array<{
   label?: string;
 }> = [
   // Page 1 — visible before 1st scroll (PAUSE_1_END=28)
-  { imageY: 470, imageX: 48, startAt: 16, duration: 10, label: "Origami (CRM)" },
-  { imageY: 1000, imageX: 300, startAt: 20, duration: 14, label: "click 2" },
-  { imageY: 1781, imageX: 295, startAt: 40, duration: 14, label: "click 3" },
-  { imageY: 1398, imageX: 427, startAt: 38, duration: 14, label: "click 4" },
-  { imageY: 2031, imageX: 174, startAt: 57, duration: 14, label: "click 5" },
-  { imageY: 2579, imageX: 173, startAt: 64, duration: 14, label: "click 6" },
-  { imageY: 2830, imageX: 426, startAt: 84, duration: 14, label: "click 7" },
-  { imageY: 3076, imageX: 172, startAt: 93, duration: 14, label: "click 8" },
-  { imageY: 3371, imageX: 175, startAt: 104, duration: 14, label: "click 9" },
+  { imageY: 470, imageX: 48, startAt: 22, duration: 10, label: "Origami (CRM)" },
+  { imageY: 1000, imageX: 300, startAt: 27, duration: 14, label: "click 2" },
+  { imageY: 1781, imageX: 295, startAt: 54, duration: 14, label: "click 3" },
+  { imageY: 1398, imageX: 427, startAt: 51, duration: 14, label: "click 4" },
+  { imageY: 2031, imageX: 174, startAt: 77, duration: 14, label: "click 5" },
+  { imageY: 2579, imageX: 173, startAt: 86, duration: 14, label: "click 6" },
+  { imageY: 2830, imageX: 426, startAt: 113, duration: 14, label: "click 7" },
+  { imageY: 3076, imageX: 172, startAt: 126, duration: 14, label: "click 8" },
+  { imageY: 3371, imageX: 175, startAt: 140, duration: 14, label: "click 9" },
 ];
 
 interface Screen2Props {
