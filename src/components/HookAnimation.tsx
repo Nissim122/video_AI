@@ -13,13 +13,14 @@ const P2_END = 30;
 const P3_START = 28;
 
 const ICONS = [
-  { id: "leads",    x: 195,  y: 671,  label: "לידים",    color: BRAND.blueL },
-  { id: "popup",    x: 885,  y: 671,  label: "פולאפים",  color: BRAND.pink  },
-  { id: "email",    x: 405,  y: 726,  label: "מיילים",   color: BRAND.blueL },
-  { id: "reminder", x: 675,  y: 726,  label: "תזכורות",  color: BRAND.blueL },
-  { id: "chat",     x: 218,  y: 1230, label: "וואטסאפ",  color: BRAND.pink  },
-  { id: "crm",      x: 862,  y: 1230, label: "CRM",      color: BRAND.pink  },
-  { id: "calendar", x: 342,  y: 1505, label: "יומן",     color: BRAND.blueL },
+  { id: "leads",    x: 118,  y: 307,  label: "לידים",    color: BRAND.pink  },
+  { id: "popup",    x: 907,  y: 383,  label: "פולאפים",  color: BRAND.pink  },
+  { id: "email",    x: 145,  y: 764,  label: "מיילים",   color: BRAND.blueL },
+  { id: "reminder", x: 621,  y: 438,  label: "תזכורות",  color: BRAND.blueL },
+  { id: "chat",     x: 650,  y: 1230, label: "הודעות",   color: BRAND.pink  },
+  { id: "crm",      x: 940,  y: 1192, label: "CRM",      color: BRAND.blueL },
+  { id: "calendar", x: 180,  y: 1409, label: "יומן",     color: BRAND.blueL },
+  { id: "chart",    x: 820,  y: 846,  label: "דוחות",    color: BRAND.pink  },
 ] as const;
 
 type IconId = typeof ICONS[number]["id"];
@@ -166,11 +167,11 @@ export const HookAnimation: React.FC<HookAnimationProps> = ({ f }) => {
               opacity={Math.max(grayOp * 2, litOp)}
             />
             {/* Gray state icon */}
-            <g opacity={(1 - litOp) * grayOp * 3}>
+            <g opacity={(1 - litOp) * grayOp * 3} transform="scale(1.6)">
               <IconShape id={icon.id} color="#6b7280" />
             </g>
             {/* Lit state icon */}
-            <g opacity={litOp}>
+            <g opacity={litOp} transform="scale(1.6)">
               <IconShape id={icon.id} color={icon.color} />
             </g>
             {/* Label */}
