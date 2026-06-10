@@ -153,6 +153,46 @@ export const MyComposition: React.FC<CompositionProps> = ({
         }}
       />
 
+      {/* ════ LOGO ════ */}
+      <div
+        style={{
+          position: "absolute",
+          top: 130,
+          left: 0,
+          right: 0,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "baseline",
+          gap: 6,
+          direction: "ltr",
+          opacity: hookOpacity,
+          pointerEvents: "none",
+        }}
+      >
+        <span
+          style={{
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 700,
+            fontSize: 82,
+            letterSpacing: "-0.04em",
+            color: BRAND.text,
+          }}
+        >
+          Clix
+        </span>
+        <span
+          style={{
+            fontFamily: "'Inter', sans-serif",
+            fontWeight: 400,
+            fontSize: 70,
+            letterSpacing: "-0.02em",
+            color: BRAND.pink,
+          }}
+        >
+          Automations
+        </span>
+      </div>
+
       {/* ════ HOOK TEXT ════ */}
       <AbsoluteFill
         style={{
@@ -177,7 +217,12 @@ export const MyComposition: React.FC<CompositionProps> = ({
             transform: `translateY(${hookY}px) scale(${hookScale})`,
           }}
         >
-          {hookText}
+          {hookText.includes("בפחות מדקה") ? (
+            <>
+              {hookText.replace("בפחות מדקה", "")}
+              <span style={{ color: BRAND.pink }}>בפחות מדקה</span>
+            </>
+          ) : hookText}
         </div>
         <div
           style={{

@@ -65,6 +65,25 @@ bottomCrops={[180, 180, 180, 180]} // מסיר: פס כתובת הדפדפן (Sa
 - אם הצילום מסך אינו Safari (אפליקציה נייטיב) — אפשר להוריד את `bottomCrops`
 - אסור להשאיר ערכים חלקיים כמו `bottomCrops={[0, 70, 0, 0]}` — תמיד לכל התמונות
 
+## לוגו Clix Automations — מידות קבועות
+
+בכל פעם שמוסיפים את לוגו העסק למסך — **תמיד** להשתמש במידות ובמיקום הבאים:
+
+```tsx
+// מיקום
+position: "absolute", top: 130, left: 0, right: 0
+display: "flex", justifyContent: "center", alignItems: "baseline"
+gap: 6, direction: "ltr"
+
+// "Clix"
+fontFamily: "'Inter', sans-serif", fontWeight: 700
+fontSize: 82, letterSpacing: "-0.04em", color: BRAND.text
+
+// "Automations"
+fontFamily: "'Inter', sans-serif", fontWeight: 400
+fontSize: 70, letterSpacing: "-0.02em", color: BRAND.pink
+```
+
 ---
 
 ## כללים

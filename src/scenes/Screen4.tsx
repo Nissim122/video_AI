@@ -10,11 +10,11 @@ import { IPhone14 } from "../components/IPhone14";
 import { ScrollGesture } from "../components/ScrollGesture";
 import { EMAIL_HTML } from "./emailHtml";
 
-export const SCREEN4_DURATION = 50;
+export const SCREEN4_DURATION = 100;
 
 const EMAIL_SCALE = 548 / 600;
 const SCROLL_START = -5;
-const MAX_SCROLL = 500;
+const MAX_SCROLL = 150;
 
 interface Screen4Props {
   startAt?: number;
@@ -78,6 +78,8 @@ export const Screen4: React.FC<Screen4Props> = ({
             transform: `translateY(${scrollY}px) scale(${EMAIL_SCALE})`,
             transformOrigin: "top left",
             width: "600px",
+            minHeight: "1400px",
+            backgroundColor: "#0e1628",
             fontFamily: "Arial, Helvetica, sans-serif",
             direction: "rtl",
           }}
