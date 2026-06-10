@@ -20,6 +20,7 @@ import { ScannerTransition } from "./scenes/ScannerTransition";
 import { Screen3 } from "./scenes/Screen3";
 import { Screen4 } from "./scenes/Screen4";
 import { Screen5 } from "./scenes/Screen5";
+import { HookAnimation } from "./components/HookAnimation";
 
 const { fontFamily } = loadFont();
 
@@ -66,7 +67,7 @@ function logicalToRaw(logical: number): number {
 
 // ── Timings ───────────────────────────────────────────────────────────────────
 const HOOK_PEAK  = 10;                          // fast punch (was 18)
-const HOOK_HOLD  = 100;                         // hold until frame 100
+const HOOK_HOLD  = 105;                         // hold until frame 105, fade to 120
 
 const PHONE_IN   = T.screen1.start;             // 36 — enters immediately
 const ZOOM_START = T.screen1.start + 26;        // 62
@@ -192,6 +193,16 @@ export const MyComposition: React.FC<CompositionProps> = ({
           Automations
         </span>
       </div>
+
+      {/* ════ HOOK ANIMATION ════ */}
+      <Sequence
+        from={logicalToRaw(T.hook.start)}
+        durationInFrames={logicalToRaw(T.screen1.start) - logicalToRaw(T.hook.start)}
+      >
+        <AbsoluteFill style={{ opacity: hookOpacity, pointerEvents: "none" }}>
+          <HookAnimation f={Math.max(0, frame - T.hook.start)} />
+        </AbsoluteFill>
+      </Sequence>
 
       {/* ════ HOOK TEXT ════ */}
       <AbsoluteFill
