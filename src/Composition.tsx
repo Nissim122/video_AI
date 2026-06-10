@@ -19,6 +19,7 @@ import { Screen2 } from "./scenes/Screen2";
 import { ScannerTransition } from "./scenes/ScannerTransition";
 import { Screen3 } from "./scenes/Screen3";
 import { Screen4 } from "./scenes/Screen4";
+import { Screen5 } from "./scenes/Screen5";
 
 const { fontFamily } = loadFont();
 
@@ -293,6 +294,22 @@ export const MyComposition: React.FC<CompositionProps> = ({
           <div style={{ transform: "scale(1.28)", transformOrigin: "center center" }}>
             <Screen4 startAt={T.screen4.start} logicalFrame={frame} />
           </div>
+        </AbsoluteFill>
+      </Sequence>
+      {/* ════ SCREEN 5 — CTA ════ */}
+      <Sequence
+        from={logicalToRaw(T.screen5.start)}
+        durationInFrames={logicalToRaw(T.screen5.end) - logicalToRaw(T.screen5.start)}
+      >
+        <AbsoluteFill
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: BRAND.bg,
+          }}
+        >
+          <Screen5 startAt={T.screen5.start} logicalFrame={frame} />
         </AbsoluteFill>
       </Sequence>
     </AbsoluteFill>

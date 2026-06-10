@@ -13,7 +13,7 @@ import { EMAIL_HTML } from "./emailHtml";
 export const SCREEN4_DURATION = 50;
 
 const EMAIL_SCALE = 548 / 600;
-const SCROLL_START = 13;
+const SCROLL_START = -5;
 const MAX_SCROLL = 500;
 
 interface Screen4Props {
@@ -84,13 +84,14 @@ export const Screen4: React.FC<Screen4Props> = ({
           dangerouslySetInnerHTML={{ __html: EMAIL_HTML }}
         />
 
-        {/* Scroll gesture overlay — same position as Screen3 */}
+        {/* Scroll gesture overlay */}
         <ScrollGesture
           frame={f}
-          imageY={800}
-          imageX={493}
+          imageY={796}
+          imageX={484}
           startAt={SCROLL_START}
           duration={40}
+          swipeDistance={260}
         />
       </div>
     </IPhone14>
