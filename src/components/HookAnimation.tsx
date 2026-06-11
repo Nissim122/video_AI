@@ -17,7 +17,7 @@ const ICONS = [
   { id: "popup",    x: 907,  y: 383,  label: "פולאפים",  color: BRAND.pink  },
   { id: "email",    x: 145,  y: 764,  label: "מיילים",   color: BRAND.blueL },
   { id: "reminder", x: 621,  y: 438,  label: "תזכורות",  color: BRAND.blueL },
-  { id: "chat",     x: 650,  y: 1230, label: "הודעות",   color: BRAND.pink  },
+  { id: "chat",     x: 564,  y: 1326, label: "הודעות",   color: BRAND.pink  },
   { id: "crm",      x: 940,  y: 1192, label: "CRM",      color: BRAND.blueL },
   { id: "calendar", x: 180,  y: 1409, label: "יומן",     color: BRAND.blueL },
   { id: "chart",    x: 820,  y: 846,  label: "דוחות",    color: BRAND.pink  },
@@ -40,8 +40,15 @@ function IconShape({ id, color }: { id: IconId; color: string }) {
       </>;
     case "email":
       return <>
-        <rect x="-24" y="-16" width="48" height="32" rx="4" fill="none" stroke={color} strokeWidth="2.5" />
-        <polyline points="-24,-16 0,8 24,-16" fill="none" stroke={color} strokeWidth="2.5" />
+        {/* Bubble body */}
+        <path
+          d="M -24,-18 Q -24,-26 0,-26 Q 24,-26 24,-18 L 24,6 Q 24,14 12,14 L 4,14 L 0,22 L -4,14 L -24,14 Q -24,14 -24,6 Z"
+          fill={color}
+        />
+        {/* Three dots inside */}
+        <circle cx="-9" cy="-4" r="3.5" fill={color === "#ffffff" ? "#0e1628" : "#ffffff"} />
+        <circle cx="0" cy="-4" r="3.5" fill={color === "#ffffff" ? "#0e1628" : "#ffffff"} />
+        <circle cx="9" cy="-4" r="3.5" fill={color === "#ffffff" ? "#0e1628" : "#ffffff"} />
       </>;
     case "reminder":
       return <>

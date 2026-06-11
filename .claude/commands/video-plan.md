@@ -25,7 +25,7 @@ Ask:
 
 ### Step 2 — Content & Script
 Based on their answers, ask:
-- What text/copy should appear on screen? (headlines, subtitles, CTAs)
+- What text/copy should appear on screen? (headlines, CTAs, text pops)
 - Is there a voiceover or is it text-only?
 - Are there specific words, phrases, or numbers that MUST appear?
 

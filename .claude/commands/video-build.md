@@ -35,7 +35,7 @@ Font: Heebo for Hebrew/body text, Inter for numbers and logo.
 ## Build Process
 
 ### Step 1 — Update Root.tsx
-Set `durationInFrames`, `fps` (default 30), `width` (default 1280), `height` (default 720) to match the plan.
+Set `durationInFrames`, `fps` (default 30), `width` (default 1080), `height` (default 1920) to match the plan.
 
 ### Step 2 — Build Composition.tsx
 - Replace or rewrite the composition based on the plan
