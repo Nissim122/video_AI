@@ -1,5 +1,5 @@
 import React from "react";
-import { useCurrentFrame, useVideoConfig, interpolate } from "remotion";
+import { useCurrentFrame, interpolate } from "remotion";
 import { BRAND } from "../brand";
 
 interface CounterNumberProps {
@@ -27,7 +27,6 @@ export const CounterNumber: React.FC<CounterNumberProps> = ({
   decimals = 0,
 }) => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
 
   const progress = interpolate(
     frame,

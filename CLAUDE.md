@@ -269,6 +269,255 @@ fontSize: 70, letterSpacing: "-0.02em", color: BRAND.pink
 
 ---
 
+## ספריית רכיבים חדשים — `src/components/` (20 רכיבים נוספים)
+
+### קטגוריה א — אפקטי טקסט
+
+### FlipText
+לוח split-flap — כל תו מתהפך לתו הסופי בזה אחר זה.
+```tsx
+<FlipText text="CLIX" enterFrame={60} stagger={4} flipDuration={20} fontSize={96} positionY={0.42} />
+```
+
+### TextStagger
+אותיות נכנסות אחת-אחת עם stagger — שונה מ-KineticText שפועל ברמת מילה.
+```tsx
+<TextStagger
+  text="אוטומציה"
+  enterFrame={60}
+  stagger={3}
+  animation="rise"  // "rise" | "drop" | "pop" | "spin"
+  fontSize={96}
+  positionY={0.42}
+  accentIndices={[0, 1]}  // אינדקסים לצביעה ב-accentColor
+  accentColor={BRAND.pink}
+/>
+```
+
+### RevealMask
+תוכן מתגלה מאחורי מסכת wipe מונפשת — mask נכנס ואז יוצא וחושף.
+```tsx
+// עוטף כל תוכן — עובד עם טקסט, כרטיסים, תמונות
+<RevealMask enterFrame={60} direction="right" maskColor={BRAND.blue} feel="snappy">
+  <TextPop text="תוצאה" enterFrame={0} />
+</RevealMask>
+// direction: "right" | "left" | "up" | "down"
+// feel: "snappy" | "smooth"
+```
+
+---
+
+### קטגוריה ב — UI מדומה
+
+### MockBrowser
+חלון דפדפן דסקטופ עם כתובת URL + תוכן — לדמו מוצר ווב.
+```tsx
+<MockBrowser
+  url="app.clixautomations.com"
+  screenshotSrc="dashboard.jpg"   // או children
+  enterFrame={60}
+  width={900}
+  positionX={90}
+  positionY={480}
+/>
+```
+
+### FormFill
+טופס שממלא את עצמו שדה-שדה, עם cursor מהבהב ו-✓ בסיום.
+```tsx
+<FormFill
+  title="פרטי הלקוח"
+  enterFrame={30}
+  fields={[
+    { label: "שם עסק", value: "Clix Automations", startFrame: 60, typingFrames: 40 },
+    { label: "אימייל",  value: "info@clix.co.il",  startFrame: 120 },
+  ]}
+/>
+```
+
+### ToggleSwitch
+מתג ON/OFF מונפש עם spring, עם תוויות לפני/אחרי.
+```tsx
+<ToggleSwitch
+  toggleFrame={90}        // frame שבו המתג מתהפך ON
+  label="מצב עבודה"
+  labelOff="ידני"
+  labelOn="אוטומטי"
+  enterFrame={30}
+  positionX={540} positionY={960}
+  color={BRAND.green}
+  size={1}
+/>
+```
+
+### AppConnector
+שני לוגואים (emoji או תמונה) עם חץ מונפש וחבילות data זורמות.
+```tsx
+<AppConnector
+  leftIcon="📧"   rightIcon="📊"
+  leftLabel="Gmail" rightLabel="Sheets"
+  enterFrame={60}
+  positionY={880}
+  color={BRAND.blue}
+  animated={true}
+/>
+```
+
+### DashboardCard
+כרטיס analytics עם counter ומיני bar chart שעולה.
+```tsx
+<DashboardCard
+  title="לידים החודש"
+  value={1240}
+  suffix="+"
+  enterFrame={90}
+  positionY={600}
+  width={460}
+  accentColor={BRAND.blue}
+  trend="up"
+  trendLabel="+18% מהחודש שעבר"
+/>
+```
+
+---
+
+### קטגוריה ג — מעברים ואפקטי מצלמה
+
+### KenBurns
+pan + zoom איטי על תמונה סטטית — אפקט תיעודי קלאסי.
+```tsx
+<KenBurns
+  src="photo.jpg"
+  startFrame={0}
+  durationFrames={300}
+  preset="zoom-in"   // "zoom-in" | "zoom-out" | "pan-right" | "pan-left" | "tilt-up" | "tilt-down"
+  panAmount={5}      // % תזוזה (רלוונטי ל-pan/tilt)
+/>
+```
+
+### GlitchCut
+עיוות דיגיטלי (RGB split + scan lines) שעוטף תוכן למשך כמה פריימים.
+```tsx
+<GlitchCut triggerFrame={120} durationFrames={8} intensity={1}>
+  {/* כל תוכן */}
+</GlitchCut>
+```
+
+### FlashTransition
+הבזק לבן (או כל צבע) סביב פריים — לחיתוך חד בין סצנות.
+```tsx
+<FlashTransition peakFrame={150} durationFrames={12} color="#ffffff" />
+```
+
+### FilmGrain
+רעש פילם overlay מונפש מעל כל המסך.
+```tsx
+<FilmGrain opacity={0.08} animated={true} blendMode="overlay" />
+```
+
+---
+
+### קטגוריה ד — רקע ואווירה
+
+### GridBackground
+רשת קווים (כמו Make.com) שגולשת לאיטה.
+```tsx
+<GridBackground cellSize={80} color={BRAND.blue} opacity={0.15} scrollSpeed={0.3} dots={true} />
+```
+
+### GradientBackground
+גרדיאנט רקע שסובב ומשנה גוונים לאיטה.
+```tsx
+<GradientBackground opacity={1} driftSpeed={0.06} angle={135} pulse={0.06} />
+```
+
+### DataStream
+זרם תווים/מספרים נופלים ברקע (Matrix-lite עם כתב יפני + 0/1).
+```tsx
+<DataStream opacity={0.18} color={BRAND.blueL} fadeInFrames={20} />
+```
+
+---
+
+### קטגוריה ה — מבנה ומידע
+
+### TestimonialCard
+כרטיס לקוח עם כוכבים + ציטוט + שם + תפקיד + avatar.
+```tsx
+<TestimonialCard
+  quote="חסכנו 12 שעות בשבוע תוך יומיים"
+  name="דנה כהן"
+  role="מנהלת שיווק, StartupXYZ"
+  avatarEmoji="👩"
+  stars={5}
+  enterFrame={60}
+  positionY={500}
+  width={880}
+/>
+```
+
+### ComparisonRow
+שורות לפני/אחרי עם חצים — "3 שעות → 3 דקות".
+```tsx
+<ComparisonRow
+  enterFrame={30}
+  positionY={400}
+  beforeLabel="לפני"
+  afterLabel="אחרי"
+  items={[
+    { before: "3 שעות",  after: "3 דקות",  label: "דוחות שבועיים",   enterFrame: 60 },
+    { before: "ידני",    after: "אוטומטי", label: "עדכון לקוחות",    enterFrame: 90 },
+  ]}
+/>
+```
+
+### TimelineStep
+שלבים (אנכי/אופקי) שמופיעים בזה אחר זה ומסמנים ✓ כשמגיעים.
+```tsx
+<TimelineStep
+  orientation="vertical"   // "vertical" | "horizontal"
+  positionY={400}
+  accentColor={BRAND.blue}
+  steps={[
+    { label: "ניתוח תהליכים", sublabel: "30 דקות", enterFrame: 60  },
+    { label: "בניית אוטומציה", sublabel: "יום עבודה", enterFrame: 120 },
+    { label: "השקה",           sublabel: "תוך שבוע",   enterFrame: 180, icon: "🚀" },
+  ]}
+/>
+```
+
+### ROIBadge
+Badge עגלגל עם counter מונפש — "חוסך 10 שעות / ₪5,000 בחודש".
+```tsx
+<ROIBadge
+  value={10}
+  unit="שעות"
+  label="נחסכות בשבוע"
+  enterFrame={90}
+  positionX={540} positionY={960}
+  color={BRAND.green}
+  size="md"  // "sm" | "md" | "lg"
+/>
+```
+
+### VideoMosaic
+רשת 2×2 או 3×3 של תמונות/קליפים שנכנסים בstagger.
+```tsx
+<VideoMosaic
+  cols={2}
+  enterFrame={60}
+  stagger={6}
+  positionY={400}
+  width={960}
+  items={[
+    { src: "clip1.mp4", type: "video", label: "לקוח א׳" },
+    { src: "img1.jpg",  type: "image", label: "לקוח ב׳" },
+  ]}
+/>
+```
+
+---
+
 ## edit-config.ts — איך מפעילים רכיבים
 
 כל הרכיבים מוגדרים ב-`src/edit-config.ts` כמערכים ואובייקטים.  

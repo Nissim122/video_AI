@@ -7,7 +7,6 @@ const CY = 960;
 const CORE_R = 48;
 
 // Phase timing (logical frames) — 45 total (1.5s at 30fps)
-const P1_END = 15;
 const P2_START = 13;
 const P2_END = 30;
 const P3_START = 28;
@@ -65,8 +64,6 @@ function IconShape({ id, color }: { id: IconId; color: string }) {
         <rect x="4" y="-24" width="20" height="20" rx="3" fill={color} />
         <rect x="4" y="4" width="20" height="20" rx="3" fill={color} />
       </>;
-    case "trigger":
-      return <path d="M 6,-24 L -8,4 L 2,4 L -6,24 L 10,-4 L 0,-4 Z" fill={color} />;
     case "calendar":
       return <>
         <rect x="-22" y="-20" width="44" height="42" rx="4" fill="none" stroke={color} strokeWidth="2.5" />
@@ -85,12 +82,6 @@ function IconShape({ id, color }: { id: IconId; color: string }) {
         <rect x="-6" y="-18" width="11" height="34" rx="2" fill={color} />
         <rect x="10" y="-8" width="11" height="24" rx="2" fill={color} />
         <line x1="-26" y1="16" x2="26" y2="16" stroke={color} strokeWidth="2.5" strokeLinecap="round" />
-      </>;
-    case "webhook":
-      return <>
-        <polyline points="-22,-16 -10,0 -22,16" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
-        <line x1="5" y1="-20" x2="-5" y2="20" stroke={color} strokeWidth="3" strokeLinecap="round" />
-        <polyline points="10,-16 22,0 10,16" fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
       </>;
   }
 }

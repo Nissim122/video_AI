@@ -16,7 +16,6 @@ import { Callout } from "../components/Callout";
 import { OutroScreen } from "../components/OutroScreen";
 import { VignetteGrade } from "../components/VignetteGrade";
 import { FadeTransition } from "../components/FadeTransition";
-import { BehindReveal } from "../components/BehindReveal";
 import { KineticText } from "../components/KineticText";
 import { BRollOverlay } from "../components/BRollOverlay";
 import { ReactionBubble } from "../components/ReactionBubble";
@@ -26,15 +25,39 @@ import { StatCard } from "../components/StatCard";
 import { HighlightBox } from "../components/HighlightBox";
 import { CTAButton } from "../components/CTAButton";
 import { SocialHandle } from "../components/SocialHandle";
+// ── New components ────────────────────────────────────────────────────────────
+import { TypewriterText } from "../components/TypewriterText";
+import { MorphText } from "../components/MorphText";
+import { TextScramble } from "../components/TextScramble";
+import { GradientText } from "../components/GradientText";
+import { WordHighlight } from "../components/WordHighlight";
+import { ChatBubble } from "../components/ChatBubble";
+import { PhoneNotification } from "../components/PhoneNotification";
+import { ConfirmCheck } from "../components/ConfirmCheck";
+import { ProgressRing } from "../components/ProgressRing";
+import { AutomationFlow } from "../components/AutomationFlow";
+import { CameraShake } from "../components/CameraShake";
+import { SpotlightReveal } from "../components/SpotlightReveal";
+import { ZoomBurst } from "../components/ZoomBurst";
+import { ParticleField } from "../components/ParticleField";
+import { GlowPulse } from "../components/GlowPulse";
+import { DrawPath } from "../components/DrawPath";
+import { CountdownTimer } from "../components/CountdownTimer";
+import { FloatingEmoji } from "../components/FloatingEmoji";
 import {
-  VIDEO_CONFIG, ZOOMS, PIPS, CHAPTERS, LOGO,
+  VIDEO_CONFIG, PIPS, CHAPTERS, LOGO,
   LOWER_THIRDS, TEXT_POPS, CALLOUTS, OUTRO, GRADE,
   FADES, BULLET_LISTS, STAT_CARDS, HIGHLIGHTS, CTA_BUTTONS, SOCIAL_HANDLES,
   KINETIC_TEXTS, BROLLS, REACTIONS, PUNCHES,
+  // New config exports
+  TYPEWRITERS, MORPHS, SCRAMBLES, GRADIENT_TEXTS, WORD_HIGHLIGHTS,
+  CHATS, NOTIFICATIONS, CHECKS, PROGRESS_RINGS, FLOWS,
+  SHAKES, SPOTLIGHTS, ZOOM_BURSTS, PARTICLE_FIELD, GLOW_PULSES,
+  DRAW_PATHS, COUNTDOWNS, FLOATING_EMOJIS,
 } from "../edit-config";
 
 const ICON_SIZE = 120;
-const LAUNCH_FRAME = 75; // 2.5s — video plays first, then icons burst in
+const LAUNCH_FRAME = 75;
 
 const ICONS = [
   { symbol: "✆", bg1: "#25D366", bg2: "#128C7E", glow: "#25D366", label: "WhatsApp", x: 118,  y: 320, stagger: 0  },
@@ -44,7 +67,6 @@ const ICONS = [
   { symbol: "✉", bg1: "#EA4335", bg2: "#C5221F", glow: "#EA4335", label: "Gmail",     x: 962,  y: 320, stagger: 8  },
 ] as const;
 
-// Hub-and-spoke from Make (idx 2) + outer ring
 const CONNECTIONS: [number, number][] = [
   [2, 0], [2, 1], [2, 3], [2, 4],
   [0, 1], [3, 4],
@@ -53,9 +75,7 @@ const CONNECTIONS: [number, number][] = [
 const iconCenterY = (i: number) => ICONS[i].y + ICON_SIZE / 2;
 
 const NetworkLines: React.FC<{ frame: number; opacity: number }> = ({ frame, opacity }) => (
-  <svg
-    style={{ position: "absolute", top: 0, left: 0, width: 1080, height: 1920 }}
-  >
+  <svg style={{ position: "absolute", top: 0, left: 0, width: 1080, height: 1920 }}>
     <defs>
       {CONNECTIONS.map((_, ci) => (
         <filter key={ci} id={`dot-glow-${ci}`} x="-100%" y="-100%" width="300%" height="300%">
@@ -67,26 +87,19 @@ const NetworkLines: React.FC<{ frame: number; opacity: number }> = ({ frame, opa
         </filter>
       ))}
     </defs>
-
     {CONNECTIONS.map(([a, b], ci) => {
       const ax = ICONS[a].x, ay = iconCenterY(a);
       const bx = ICONS[b].x, by = iconCenterY(b);
       const color = ICONS[a].glow;
-
       const speed = 0.55 + ci * 0.07;
       const t = ((frame / 30) * speed + ci * 0.28) % 1;
       const dotX = ax + (bx - ax) * t;
       const dotY = ay + (by - ay) * t;
-
       return (
         <g key={ci} opacity={opacity}>
-          {/* thin base line */}
           <line x1={ax} y1={ay} x2={bx} y2={by} stroke={color} strokeWidth={1.5} strokeOpacity={0.2} />
-          {/* soft wide glow line */}
           <line x1={ax} y1={ay} x2={bx} y2={by} stroke={color} strokeWidth={6}  strokeOpacity={0.06} />
-          {/* outer halo of dot */}
           <circle cx={dotX} cy={dotY} r={10} fill={color} opacity={0.18} />
-          {/* core dot with glow filter */}
           <circle cx={dotX} cy={dotY} r={5}  fill={color} opacity={0.95} filter={`url(#dot-glow-${ci})`} />
         </g>
       );
@@ -95,52 +108,39 @@ const NetworkLines: React.FC<{ frame: number; opacity: number }> = ({ frame, opa
 );
 
 const AppIcon: React.FC<{ icon: (typeof ICONS)[number]; index: number; frame: number; fps: number }> = ({
-  icon,
-  index,
-  frame,
-  fps,
+  icon, index, frame, fps,
 }) => {
   const delay = LAUNCH_FRAME + icon.stagger;
   const localFrame = Math.max(0, frame - delay);
-
-  const progress = spring({
-    frame: localFrame,
-    fps,
-    config: { damping: 10, stiffness: 150, mass: 0.8 },
-  });
-
+  const progress = spring({ frame: localFrame, fps, config: { damping: 10, stiffness: 150, mass: 0.8 } });
   const y = icon.y + (1700 - icon.y) * (1 - progress);
   const scale = interpolate(progress, [0, 0.4, 1], [0, 1.2, 1], { extrapolateRight: "clamp" });
-
   const settled = localFrame > 45;
   const floatY = settled ? Math.sin(((frame + index * 23) / fps) * Math.PI * 1.25) * 10 : 0;
   const floatRotate = settled ? Math.sin(((frame + index * 17) / fps) * Math.PI * 0.9) * 1.8 : 0;
-
   return (
-    <div
-      style={{
-        position: "absolute",
-        left: icon.x - ICON_SIZE / 2,
-        top: y + floatY,
-        width: ICON_SIZE,
-        height: ICON_SIZE,
-        borderRadius: 26,
-        background: `linear-gradient(145deg, ${icon.bg1}, ${icon.bg2})`,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 50,
-        color: "#fff",
-        transform: `scale(${scale}) rotate(${floatRotate}deg)`,
-        transformOrigin: "center bottom",
-        boxShadow: [
-          `0 0 0 2px rgba(255,255,255,0.15)`,
-          `0 0 22px ${icon.glow}88`,
-          `0 0 55px ${icon.glow}44`,
-          `0 10px 30px rgba(0,0,0,0.55)`,
-        ].join(", "),
-      }}
-    >
+    <div style={{
+      position: "absolute",
+      left: icon.x - ICON_SIZE / 2,
+      top: y + floatY,
+      width: ICON_SIZE,
+      height: ICON_SIZE,
+      borderRadius: 26,
+      background: `linear-gradient(145deg, ${icon.bg1}, ${icon.bg2})`,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: 50,
+      color: "#fff",
+      transform: `scale(${scale}) rotate(${floatRotate}deg)`,
+      transformOrigin: "center bottom",
+      boxShadow: [
+        `0 0 0 2px rgba(255,255,255,0.15)`,
+        `0 0 22px ${icon.glow}88`,
+        `0 0 55px ${icon.glow}44`,
+        `0 10px 30px rgba(0,0,0,0.55)`,
+      ].join(", "),
+    }}>
       {icon.symbol}
     </div>
   );
@@ -156,125 +156,219 @@ export const VideoOverlay: React.FC = () => {
     extrapolateRight: "clamp",
   });
 
-  // Subtle dark vignette at top so icons pop against any background
   const topGradient =
     "linear-gradient(to bottom, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.25) 35%, transparent 55%)";
 
   return (
     <AbsoluteFill>
-      {/* Base video layer */}
-      <VideoBase src="test-video.mp4" />
+      {/* ── ZoomBurst + CameraShake wrap everything ── */}
+      <ZoomBurst bursts={ZOOM_BURSTS}>
+        <CameraShake shakes={SHAKES}>
 
-      {/* Top vignette */}
-      <AbsoluteFill style={{ background: topGradient, pointerEvents: "none" }} />
+          {/* Base video */}
+          <VideoBase src={VIDEO_CONFIG.src} />
 
-      {/* Network connections */}
-      <AbsoluteFill style={{ pointerEvents: "none" }}>
-        <NetworkLines frame={frame} opacity={networkOpacity} />
-      </AbsoluteFill>
+          {/* Particle field — background layer */}
+          {PARTICLE_FIELD.show && (
+            <ParticleField
+              count={PARTICLE_FIELD.count}
+              color={PARTICLE_FIELD.color}
+              dotSize={PARTICLE_FIELD.dotSize}
+              speed={PARTICLE_FIELD.speed}
+              connected={PARTICLE_FIELD.connected}
+              opacity={PARTICLE_FIELD.opacity}
+              enterFrame={PARTICLE_FIELD.enterFrame}
+            />
+          )}
 
-      {/* App icons */}
-      {ICONS.map((icon, i) => (
-        <AppIcon key={i} icon={icon} index={i} frame={frame} fps={fps} />
-      ))}
+          {/* Glow pulses — background atmosphere */}
+          {GLOW_PULSES.map((gp, i) => (
+            <GlowPulse key={i} {...gp} />
+          ))}
 
-      {/* B-Roll overlays — above base video, below UI overlays */}
-      {BROLLS.map((br, i) => (
-        <BRollOverlay key={i} {...br} />
-      ))}
+          {/* Top vignette */}
+          <AbsoluteFill style={{ background: topGradient, pointerEvents: "none" }} />
 
-      {/* Vignette + color grade — sits above video, below overlays */}
-      {GRADE.show && (
-        <VignetteGrade
-          vignetteStrength={GRADE.vignetteStrength}
-          tone={GRADE.tone}
-          brightness={GRADE.brightness}
-          contrast={GRADE.contrast}
-        />
-      )}
+          {/* Network connections */}
+          <AbsoluteFill style={{ pointerEvents: "none" }}>
+            <NetworkLines frame={frame} opacity={networkOpacity} />
+          </AbsoluteFill>
 
-      {/* PiP overlays */}
-      {PIPS.map((pip, i) => (
-        <PictureInPicture key={i} {...pip} />
-      ))}
+          {/* App icons */}
+          {ICONS.map((icon, i) => (
+            <AppIcon key={i} icon={icon} index={i} frame={frame} fps={fps} />
+          ))}
 
-      {/* Callouts */}
-      {CALLOUTS.map((c, i) => (
-        <Callout key={i} {...c} />
-      ))}
+          {/* B-Roll overlays */}
+          {BROLLS.map((br, i) => (
+            <BRollOverlay key={i} {...br} />
+          ))}
 
-      {/* Text pops */}
-      {TEXT_POPS.map((tp, i) => (
-        <TextPop key={i} {...tp} />
-      ))}
+          {/* Vignette + color grade */}
+          {GRADE.show && (
+            <VignetteGrade
+              vignetteStrength={GRADE.vignetteStrength}
+              tone={GRADE.tone}
+              brightness={GRADE.brightness}
+              contrast={GRADE.contrast}
+            />
+          )}
 
-      {/* Lower thirds */}
-      {LOWER_THIRDS.map((lt, i) => (
-        <LowerThird key={i} {...lt} />
-      ))}
+          {/* Spotlight reveals — dims surroundings */}
+          {SPOTLIGHTS.map((sp, i) => (
+            <SpotlightReveal key={i} {...sp} />
+          ))}
 
-      {/* Chapter markers + progress bar */}
-      <ChapterMarker
-        totalFrames={VIDEO_CONFIG.durationInFrames}
-        chapters={CHAPTERS}
-        showProgressBar={CHAPTERS.length > 0}
-      />
+          {/* Draw paths — SVG arrows */}
+          {DRAW_PATHS.map((dp, i) => (
+            <DrawPath key={i} {...dp} />
+          ))}
 
-      {/* Logo watermark */}
-      {LOGO.show && (
-        <LogoWatermark corner={LOGO.corner} fadeInFrame={LOGO.fadeInFrame} />
-      )}
+          {/* PiP overlays */}
+          {PIPS.map((pip, i) => (
+            <PictureInPicture key={i} {...pip} />
+          ))}
 
-      {/* Bullet lists */}
-      {BULLET_LISTS.map((bl, i) => (
-        <BulletList key={i} {...bl} />
-      ))}
+          {/* Automation flow diagrams */}
+          {FLOWS.map((fl, i) => (
+            <AutomationFlow key={i} {...fl} />
+          ))}
 
-      {/* Stat cards */}
-      {STAT_CARDS.map((sc, i) => (
-        <StatCard key={i} {...sc} />
-      ))}
+          {/* Callouts */}
+          {CALLOUTS.map((c, i) => (
+            <Callout key={i} {...c} />
+          ))}
 
-      {/* Highlight boxes */}
-      {HIGHLIGHTS.map((h, i) => (
-        <HighlightBox key={i} {...h} />
-      ))}
+          {/* Text pops */}
+          {TEXT_POPS.map((tp, i) => (
+            <TextPop key={i} {...tp} />
+          ))}
 
-      {/* CTA buttons */}
-      {CTA_BUTTONS.map((btn, i) => (
-        <CTAButton key={i} {...btn} />
-      ))}
+          {/* Typewriter texts */}
+          {TYPEWRITERS.map((tw, i) => (
+            <TypewriterText key={i} {...tw} />
+          ))}
 
-      {/* Kinetic text — word-by-word, above everything */}
-      {KINETIC_TEXTS.map((kt, i) => (
-        <KineticText key={i} {...kt} />
-      ))}
+          {/* Text scrambles */}
+          {SCRAMBLES.map((sc, i) => (
+            <TextScramble key={i} {...sc} />
+          ))}
 
-      {/* Reaction bubbles */}
-      {REACTIONS.length > 0 && <ReactionBubble reactions={REACTIONS} />}
+          {/* Gradient texts */}
+          {GRADIENT_TEXTS.map((gt, i) => (
+            <GradientText key={i} {...gt} />
+          ))}
 
-      {/* Punch transitions — always last so they render on top of everything */}
-      {PUNCHES.length > 0 && <PunchTransition punches={PUNCHES} />}
+          {/* Word highlights */}
+          {WORD_HIGHLIGHTS.map((wh, i) => (
+            <WordHighlight key={i} {...wh} />
+          ))}
 
-      {/* Social handles */}
-      {SOCIAL_HANDLES.map((sh, i) => (
-        <SocialHandle key={i} {...sh} />
-      ))}
+          {/* Morph texts */}
+          {MORPHS.map((mt, i) => (
+            <MorphText key={i} {...mt} />
+          ))}
 
-      {/* Outro screen */}
-      {OUTRO.show && (
-        <OutroScreen
-          enterFrame={OUTRO.enterFrame}
-          ctaText={OUTRO.ctaText}
-          subText={OUTRO.subText}
-          linkText={OUTRO.linkText}
-        />
-      )}
+          {/* Countdown timers */}
+          {COUNTDOWNS.map((cd, i) => (
+            <CountdownTimer key={i} {...cd} />
+          ))}
 
-      {/* Fade transitions — always last */}
-      {FADES.map((f, i) => (
-        <FadeTransition key={i} {...f} />
-      ))}
+          {/* Progress rings */}
+          {PROGRESS_RINGS.map((pr, i) => (
+            <ProgressRing key={i} {...pr} />
+          ))}
+
+          {/* Confirm checks */}
+          {CHECKS.map((ck, i) => (
+            <ConfirmCheck key={i} {...ck} />
+          ))}
+
+          {/* Lower thirds */}
+          {LOWER_THIRDS.map((lt, i) => (
+            <LowerThird key={i} {...lt} />
+          ))}
+
+          {/* Chapter markers + progress bar */}
+          <ChapterMarker
+            totalFrames={VIDEO_CONFIG.durationInFrames}
+            chapters={CHAPTERS}
+            showProgressBar={CHAPTERS.length > 0}
+          />
+
+          {/* Logo watermark */}
+          {LOGO.show && (
+            <LogoWatermark corner={LOGO.corner} fadeInFrame={LOGO.fadeInFrame} />
+          )}
+
+          {/* Bullet lists */}
+          {BULLET_LISTS.map((bl, i) => (
+            <BulletList key={i} {...bl} />
+          ))}
+
+          {/* Stat cards */}
+          {STAT_CARDS.map((sc, i) => (
+            <StatCard key={i} {...sc} />
+          ))}
+
+          {/* Highlight boxes */}
+          {HIGHLIGHTS.map((h, i) => (
+            <HighlightBox key={i} {...h} />
+          ))}
+
+          {/* CTA buttons */}
+          {CTA_BUTTONS.map((btn, i) => (
+            <CTAButton key={i} {...btn} />
+          ))}
+
+          {/* Phone notifications — near top */}
+          {NOTIFICATIONS.map((n, i) => (
+            <PhoneNotification key={i} {...n} />
+          ))}
+
+          {/* Chat bubbles */}
+          {CHATS.map((ch, i) => (
+            <ChatBubble key={i} {...ch} />
+          ))}
+
+          {/* Kinetic text — word-by-word */}
+          {KINETIC_TEXTS.map((kt, i) => (
+            <KineticText key={i} {...kt} />
+          ))}
+
+          {/* Reaction bubbles */}
+          {REACTIONS.length > 0 && <ReactionBubble reactions={REACTIONS} />}
+
+          {/* Floating emojis — TikTok-style */}
+          {FLOATING_EMOJIS.length > 0 && (
+            <FloatingEmoji emojis={FLOATING_EMOJIS} />
+          )}
+
+          {/* Punch transitions */}
+          {PUNCHES.length > 0 && <PunchTransition punches={PUNCHES} />}
+
+          {/* Social handles */}
+          {SOCIAL_HANDLES.map((sh, i) => (
+            <SocialHandle key={i} {...sh} />
+          ))}
+
+          {/* Outro screen */}
+          {OUTRO.show && (
+            <OutroScreen
+              enterFrame={OUTRO.enterFrame}
+              ctaText={OUTRO.ctaText}
+              subText={OUTRO.subText}
+              linkText={OUTRO.linkText}
+            />
+          )}
+
+          {/* Fade transitions — always last */}
+          {FADES.map((f, i) => (
+            <FadeTransition key={i} {...f} />
+          ))}
+
+        </CameraShake>
+      </ZoomBurst>
     </AbsoluteFill>
   );
 };

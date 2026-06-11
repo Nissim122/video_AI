@@ -38,7 +38,6 @@ export const StatCard: React.FC<StatCardProps> = ({
   const opacity = interpolate(enter, [0, 0.3], [0, 1], { extrapolateRight: "clamp" });
 
   const left = positionX === "center" ? undefined : positionX;
-  const right = positionX === "center" ? undefined : undefined;
 
   return (
     <div
