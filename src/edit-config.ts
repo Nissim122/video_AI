@@ -558,6 +558,77 @@ export const FLOATING_EMOJIS: EmojiFloat[] = [
   // { emoji: "🚀", frame: 150 },
 ];
 
+// ── FocusZoom — Auto-Focus / UI Zoom ─────────────────────────────────────────
+// זום אוטומטי אל אזור ספציפי — אידיאלי כשמציגים MockBrowser בפורמט 9:16
+// עוטף את הרכיב ב-Composition.tsx ישירות (לא דרך VideoOverlay):
+//
+// import { FocusZoom } from "./components/FocusZoom";
+//
+// // זום פנימה אל אזור הטופס בתוך הדפדפן (MockBrowser מרוכז בחצי העליון)
+// <FocusZoom
+//   zoomFrame={90}           // frame שבו מתחיל הזום
+//   focusX={0.5}             // 0–1, מרכז אופקי של האזור לזום
+//   focusY={0.42}            // 0–1, מרכז אנכי — 0.42 ≈ אמצע MockBrowser
+//   scale={2.2}              // כמה לזום פנימה
+//   holdFrames={120}         // פריימים להישאר מוזום לפני חזרה
+//   feel="smooth"            // "snappy" | "smooth" | "bouncy"
+// >
+//   <MockBrowser url="app.clix.com" screenshotSrc="dashboard.jpg" enterFrame={0} />
+// </FocusZoom>
+//
+// טיפ: קבע focusY לפי מיקום האלמנט הרלוונטי בתוך הדפדפן.
+// לדוגמה, אם הטופס נמצא בחלק העליון של הדפדפן שמתחיל ב-Y=480:
+//   focusY = (480 + 300) / 1920 ≈ 0.41
+
+// ── SmartStack — Dynamic Padding & Grouping ───────────────────────────────────
+// מונע חפיפה בין רכיבים שנמצאים באותה אזור (למשל LowerThird + CTAButton)
+// שימוש ב-Composition.tsx ישירות:
+//
+// import { SmartStack } from "./components/SmartStack";
+//
+// const VIDEO_H = 1920;
+// const LOWER_H = 120;  // גובה משוער של LowerThird
+// const CTA_H   = 86;   // גובה משוער של CTAButton
+//
+// <SmartStack
+//   padding={24}
+//   items={[
+//     {
+//       key: "cta",
+//       preferredBottom: 180,   // רוצה להיות 180px מהתחתית
+//       height: CTA_H,
+//       render: (b, z) => (
+//         <CTAButton
+//           text="לפרטים נוספים"
+//           enterFrame={600}
+//           positionY={VIDEO_H - b - CTA_H}   // המרת bottom→top
+//         />
+//         // הערה: z מועבר אוטומטית — השתמש בו כאשר עוטפים ב-div עם zIndex
+//       ),
+//     },
+//     {
+//       key: "lower",
+//       preferredBottom: 260,   // רוצה 260px מהתחתית — יוסט למעלה אם יש חפיפה
+//       height: LOWER_H,
+//       render: (b, z) => (
+//         <LowerThird
+//           name="ניסים בנגייב"
+//           title="מייסד Clix Automations"
+//           enterFrame={30}
+//           holdFrames={90}
+//           positionBottom={b}  // prop חדש שמאפשר override
+//         />
+//       ),
+//     },
+//   ]}
+// />
+//
+// z-index אוטומטי: הפריט הנמוך ביותר על המסך מקבל z גבוה יותר,
+// כך שאם צלליות/blur דולף, הפריט שבחזית נשאר נראה נכון.
+//
+// SmartStack ימקם את ה-CTA ב-180px, וה-LowerThird ב-180+86+24=290px (במקום 260)
+// כדי שלא יחפף. אם אין חפיפה, כל אחד מקבל את preferredBottom שלו.
+
 // ── TrackedOverlays — Spatial Tracking ───────────────────────────────────────
 // רכיבים שעוקבים אחרי נקודת יד זזה בוידאו (MediaPipe)
 //

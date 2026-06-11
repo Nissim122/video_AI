@@ -8,6 +8,8 @@ interface LowerThirdProps {
   enterFrame: number;
   /** frames to stay visible before sliding out (0 = stay forever) */
   holdFrames?: number;
+  /** override default distance from canvas bottom (default 260) — use with SmartStack */
+  positionBottom?: number;
 }
 
 export const LowerThird: React.FC<LowerThirdProps> = ({
@@ -15,6 +17,7 @@ export const LowerThird: React.FC<LowerThirdProps> = ({
   title,
   enterFrame,
   holdFrames = 0,
+  positionBottom,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -41,7 +44,7 @@ export const LowerThird: React.FC<LowerThirdProps> = ({
     <div
       style={{
         position: "absolute",
-        bottom: 260,
+        bottom: positionBottom ?? 260,
         left: 60,
         transform: `translateX(${translateX}px)`,
         opacity,
