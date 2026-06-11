@@ -8,6 +8,9 @@ import type { ShakeEvent } from "./components/CameraShake";
 import type { ZoomBurstEvent } from "./components/ZoomBurst";
 import type { ChatMessage } from "./components/ChatBubble";
 import type { EmojiFloat } from "./components/FloatingEmoji";
+import type { TrackingData } from "./components/TrackedOverlay";
+import type { SmartZoomEvent } from "./components/SmartZoom";
+import type { WhipPanEvent } from "./components/WhipPan";
 
 export const VIDEO_CONFIG = {
   src: "test-video.mp4",    // שם הקובץ ב-public/
@@ -513,6 +516,38 @@ export const COUNTDOWNS: Array<{
   // { from: 5, to: 1, enterFrame: 60, framesPerNumber: 25, positionY: 0.35, label: "שניות בלבד" },
 ];
 
+// ── SmartZoom ─────────────────────────────────────────────────────────────────
+// זום עם נקודת פוקוס מדויקת — focusX/Y הם 0–1 (שבר של רוחב/גובה המסך)
+// 0.5, 0.5 = מרכז | 0.25, 0.3 = רבע שמאל למעלה (לדובר שנמצא שם)
+// feel: "snappy" | "smooth" | "bouncy"
+export const SMART_ZOOMS: SmartZoomEvent[] = [
+  // { startFrame: 60, endFrame: 180, scale: 1.3, focusX: 0.5, focusY: 0.28, feel: "snappy" },
+];
+
+// ── WhipPan ───────────────────────────────────────────────────────────────────
+// מעבר צליפת מצלמה מהיר עם motion blur — לחיתוכים בין קטעים
+// direction: "left" | "right" | "up" | "down"
+// duration: אורך בפריימים (ברירת מחדל 10 = שליש שנייה ב-30fps)
+// intensity: עוצמת הצליפה (1 = רגיל, 2 = חזק מאוד)
+export const WHIP_PANS: WhipPanEvent[] = [
+  // { frame: 150, direction: "right", duration: 10, intensity: 1 },
+  // { frame: 420, direction: "left",  duration: 8,  intensity: 1.3 },
+];
+
+// ── ContinuousDrift ───────────────────────────────────────────────────────────
+// תנועה איטית ובלתי פוסקת שמחיה קטעים סטטיים ארוכים
+// mode: "pan" (תנועה בלבד) | "zoom" (נשימת זום בלבד) | "both"
+// panAmount: פיקסלים מקסימום (ברירת מחדל 12 — כמעט בלתי מורגש)
+// zoomAmount: תוספת סקייל (ברירת מחדל 0.04 = 4%)
+// speed: מהירות האוסצילציה (ברירת מחדל 1)
+export const DRIFT = {
+  enabled:    false,
+  mode:       "both" as const,
+  panAmount:  12,
+  zoomAmount: 0.04,
+  speed:      1,
+};
+
 // ── 20. FloatingEmoji ─────────────────────────────────────────────────────────
 // אמוג'י שעולים מלמטה (כמו ריאקציות בTikTok Live)
 // x: 0–1 מיקום אופקי (אופציונלי — מתפזר אוטומטית)
@@ -521,4 +556,52 @@ export const FLOATING_EMOJIS: EmojiFloat[] = [
   // { emoji: "🙌", frame: 110, x: 0.3 },
   // { emoji: "💯", frame: 130, x: 0.7 },
   // { emoji: "🚀", frame: 150 },
+];
+
+// ── TrackedOverlays — Spatial Tracking ───────────────────────────────────────
+// רכיבים שעוקבים אחרי נקודת יד זזה בוידאו (MediaPipe)
+//
+// שלב 1 — הרצת ה-Python script:
+//   pip install mediapipe opencv-python
+//   python tools/track_hands.py public/my-video.mp4 --output src/tracking/my-video.json
+//
+// שלב 2 — ייבוא ה-JSON:
+//   import myVideoTracking from "./tracking/my-video.json";
+//
+// שלב 3 — הוספה כאן:
+//   {
+//     data: myVideoTracking as TrackingData,
+//     type: "callout",
+//     text: "שים לב לכאן!",
+//     side: "right",
+//     enterFrame: 60,
+//     exitFrame: 180,
+//   }
+//
+// type: "callout" | "glow" | "emoji"
+// offsetX/Y: הזזה בפיקסלים מנקודת המעקב (למשל offsetY: -100 = 100px מעל היד)
+export const TRACKED_OVERLAYS: Array<{
+  data: TrackingData;
+  type: "callout" | "glow" | "emoji";
+  enterFrame?: number;
+  exitFrame?: number;
+  offsetX?: number;
+  offsetY?: number;
+  // callout
+  text?: string;
+  side?: "left" | "right";
+  // glow
+  color?: string;
+  glowRadius?: number;
+  // emoji
+  emoji?: string;
+}> = [
+  // {
+  //   data: myVideoTracking as TrackingData,
+  //   type: "callout",
+  //   text: "שים לב!",
+  //   side: "right",
+  //   enterFrame: 60,
+  //   exitFrame: 180,
+  // },
 ];

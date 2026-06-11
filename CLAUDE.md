@@ -500,6 +500,47 @@ Badge עגלגל עם counter מונפש — "חוסך 10 שעות / ₪5,000 ב
 />
 ```
 
+---
+
+## קטגוריה ו — מנוע מצלמה מתקדם (Camera Engine)
+
+> כל 3 הרכיבים פועלים דרך `edit-config.ts` ונטענים אוטומטית ב-`VideoOverlay.tsx`.  
+> סדר שכבות ה-wrapper: `ZoomBurst → SmartZoom → ContinuousDrift → WhipPan → CameraShake → תוכן`
+
+### SmartZoom
+זום עם נקודת פוקוס מדויקת — לא עיוור למרכז, אלא לאן שצריך.
+```ts
+export const SMART_ZOOMS: SmartZoomEvent[] = [
+  { startFrame: 60, endFrame: 180, scale: 1.3, focusX: 0.5, focusY: 0.28, feel: "snappy" },
+  // focusX/Y: 0–1 (שבר של רוחב/גובה המסך)
+  // 0.5, 0.5 = מרכז | 0.5, 0.25 = פנים דובר בחלק עליון של הפריים
+  // feel: "snappy" | "smooth" | "bouncy"
+];
+```
+
+### WhipPan
+צליפת מצלמה מהירה עם motion blur — לחיתוכים בין קטעים.
+```ts
+export const WHIP_PANS: WhipPanEvent[] = [
+  { frame: 150, direction: "right", duration: 10, intensity: 1 },
+  // direction: "left" | "right" | "up" | "down"
+  // duration: פריימים (ברירת מחדל 10)
+  // intensity: 1 = רגיל, 2 = חזק מאוד
+];
+```
+
+### ContinuousDrift
+תנועה איטית ובלתי פוסקת שמחיה קטעים סטטיים — לא עוצרת אף פעם.
+```ts
+export const DRIFT = {
+  enabled:    true,
+  mode:       "both" as const,  // "pan" | "zoom" | "both"
+  panAmount:  12,               // פיקסלים מקסימום (12 = כמעט בלתי מורגש)
+  zoomAmount: 0.04,             // תוספת סקייל (0.04 = 4%)
+  speed:      1,                // מהירות אוסצילציה
+};
+```
+
 ### VideoMosaic
 רשת 2×2 או 3×3 של תמונות/קליפים שנכנסים בstagger.
 ```tsx

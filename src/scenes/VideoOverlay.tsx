@@ -44,6 +44,10 @@ import { GlowPulse } from "../components/GlowPulse";
 import { DrawPath } from "../components/DrawPath";
 import { CountdownTimer } from "../components/CountdownTimer";
 import { FloatingEmoji } from "../components/FloatingEmoji";
+import { TrackedOverlay } from "../components/TrackedOverlay";
+import { SmartZoom } from "../components/SmartZoom";
+import { WhipPan } from "../components/WhipPan";
+import { ContinuousDrift } from "../components/ContinuousDrift";
 import {
   VIDEO_CONFIG, PIPS, CHAPTERS, LOGO,
   LOWER_THIRDS, TEXT_POPS, CALLOUTS, OUTRO, GRADE,
@@ -54,6 +58,7 @@ import {
   CHATS, NOTIFICATIONS, CHECKS, PROGRESS_RINGS, FLOWS,
   SHAKES, SPOTLIGHTS, ZOOM_BURSTS, PARTICLE_FIELD, GLOW_PULSES,
   DRAW_PATHS, COUNTDOWNS, FLOATING_EMOJIS,
+  SMART_ZOOMS, WHIP_PANS, DRIFT, TRACKED_OVERLAYS,
 } from "../edit-config";
 
 const ICON_SIZE = 120;
@@ -161,213 +166,272 @@ export const VideoOverlay: React.FC = () => {
 
   return (
     <AbsoluteFill>
-      {/* ── ZoomBurst + CameraShake wrap everything ── */}
+      {/* ── Camera stack: ZoomBurst > SmartZoom > ContinuousDrift > WhipPan > CameraShake ── */}
       <ZoomBurst bursts={ZOOM_BURSTS}>
-        <CameraShake shakes={SHAKES}>
+        <SmartZoom events={SMART_ZOOMS}>
+          <ContinuousDrift
+            enabled={DRIFT.enabled}
+            mode={DRIFT.mode}
+            panAmount={DRIFT.panAmount}
+            zoomAmount={DRIFT.zoomAmount}
+            speed={DRIFT.speed}
+          >
+            <WhipPan whips={WHIP_PANS}>
+              <CameraShake shakes={SHAKES}>
 
-          {/* Base video */}
-          <VideoBase src={VIDEO_CONFIG.src} />
+                {/* Base video */}
+                <VideoBase src={VIDEO_CONFIG.src} />
 
-          {/* Particle field — background layer */}
-          {PARTICLE_FIELD.show && (
-            <ParticleField
-              count={PARTICLE_FIELD.count}
-              color={PARTICLE_FIELD.color}
-              dotSize={PARTICLE_FIELD.dotSize}
-              speed={PARTICLE_FIELD.speed}
-              connected={PARTICLE_FIELD.connected}
-              opacity={PARTICLE_FIELD.opacity}
-              enterFrame={PARTICLE_FIELD.enterFrame}
-            />
-          )}
+                {/* Particle field — background layer */}
+                {PARTICLE_FIELD.show && (
+                  <ParticleField
+                    count={PARTICLE_FIELD.count}
+                    color={PARTICLE_FIELD.color}
+                    dotSize={PARTICLE_FIELD.dotSize}
+                    speed={PARTICLE_FIELD.speed}
+                    connected={PARTICLE_FIELD.connected}
+                    opacity={PARTICLE_FIELD.opacity}
+                    enterFrame={PARTICLE_FIELD.enterFrame}
+                  />
+                )}
 
-          {/* Glow pulses — background atmosphere */}
-          {GLOW_PULSES.map((gp, i) => (
-            <GlowPulse key={i} {...gp} />
-          ))}
+                {/* Glow pulses — background atmosphere */}
+                {GLOW_PULSES.map((gp, i) => (
+                  <GlowPulse key={i} {...gp} />
+                ))}
 
-          {/* Top vignette */}
-          <AbsoluteFill style={{ background: topGradient, pointerEvents: "none" }} />
+                {/* Top vignette */}
+                <AbsoluteFill style={{ background: topGradient, pointerEvents: "none" }} />
 
-          {/* Network connections */}
-          <AbsoluteFill style={{ pointerEvents: "none" }}>
-            <NetworkLines frame={frame} opacity={networkOpacity} />
-          </AbsoluteFill>
+                {/* Network connections */}
+                <AbsoluteFill style={{ pointerEvents: "none" }}>
+                  <NetworkLines frame={frame} opacity={networkOpacity} />
+                </AbsoluteFill>
 
-          {/* App icons */}
-          {ICONS.map((icon, i) => (
-            <AppIcon key={i} icon={icon} index={i} frame={frame} fps={fps} />
-          ))}
+                {/* App icons */}
+                {ICONS.map((icon, i) => (
+                  <AppIcon key={i} icon={icon} index={i} frame={frame} fps={fps} />
+                ))}
 
-          {/* B-Roll overlays */}
-          {BROLLS.map((br, i) => (
-            <BRollOverlay key={i} {...br} />
-          ))}
+                {/* B-Roll overlays */}
+                {BROLLS.map((br, i) => (
+                  <BRollOverlay key={i} {...br} />
+                ))}
 
-          {/* Vignette + color grade */}
-          {GRADE.show && (
-            <VignetteGrade
-              vignetteStrength={GRADE.vignetteStrength}
-              tone={GRADE.tone}
-              brightness={GRADE.brightness}
-              contrast={GRADE.contrast}
-            />
-          )}
+                {/* Vignette + color grade */}
+                {GRADE.show && (
+                  <VignetteGrade
+                    vignetteStrength={GRADE.vignetteStrength}
+                    tone={GRADE.tone}
+                    brightness={GRADE.brightness}
+                    contrast={GRADE.contrast}
+                  />
+                )}
 
-          {/* Spotlight reveals — dims surroundings */}
-          {SPOTLIGHTS.map((sp, i) => (
-            <SpotlightReveal key={i} {...sp} />
-          ))}
+                {/* Spotlight reveals — dims surroundings */}
+                {SPOTLIGHTS.map((sp, i) => (
+                  <SpotlightReveal key={i} {...sp} />
+                ))}
 
-          {/* Draw paths — SVG arrows */}
-          {DRAW_PATHS.map((dp, i) => (
-            <DrawPath key={i} {...dp} />
-          ))}
+                {/* Draw paths — SVG arrows */}
+                {DRAW_PATHS.map((dp, i) => (
+                  <DrawPath key={i} {...dp} />
+                ))}
 
-          {/* PiP overlays */}
-          {PIPS.map((pip, i) => (
-            <PictureInPicture key={i} {...pip} />
-          ))}
+                {/* PiP overlays */}
+                {PIPS.map((pip, i) => (
+                  <PictureInPicture key={i} {...pip} />
+                ))}
 
-          {/* Automation flow diagrams */}
-          {FLOWS.map((fl, i) => (
-            <AutomationFlow key={i} {...fl} />
-          ))}
+                {/* Automation flow diagrams */}
+                {FLOWS.map((fl, i) => (
+                  <AutomationFlow key={i} {...fl} />
+                ))}
 
-          {/* Callouts */}
-          {CALLOUTS.map((c, i) => (
-            <Callout key={i} {...c} />
-          ))}
+                {/* Callouts */}
+                {CALLOUTS.map((c, i) => (
+                  <Callout key={i} {...c} />
+                ))}
 
-          {/* Text pops */}
-          {TEXT_POPS.map((tp, i) => (
-            <TextPop key={i} {...tp} />
-          ))}
+                {/* Tracked overlays — spatial tracking via MediaPipe */}
+                {TRACKED_OVERLAYS.map((to, i) => (
+                  <TrackedOverlay
+                    key={i}
+                    data={to.data}
+                    enterFrame={to.enterFrame}
+                    exitFrame={to.exitFrame}
+                    offsetX={to.offsetX}
+                    offsetY={to.offsetY}
+                  >
+                    {({ x, y }) =>
+                      to.type === "callout" ? (
+                        <Callout
+                          arrowX={x}
+                          arrowY={y}
+                          text={to.text ?? ""}
+                          side={to.side}
+                          enterFrame={0}
+                          holdFrames={9999}
+                          accentColor={to.color}
+                        />
+                      ) : to.type === "glow" ? (
+                        <GlowPulse
+                          positionX={x / 1080}
+                          positionY={y / 1920}
+                          color={to.color}
+                          radius={to.glowRadius}
+                          enterFrame={0}
+                        />
+                      ) : to.type === "emoji" ? (
+                        <div
+                          style={{
+                            position: "absolute",
+                            left: x - 40,
+                            top: y - 40,
+                            fontSize: 80,
+                            lineHeight: 1,
+                            filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.5))",
+                          }}
+                        >
+                          {to.emoji}
+                        </div>
+                      ) : null
+                    }
+                  </TrackedOverlay>
+                ))}
 
-          {/* Typewriter texts */}
-          {TYPEWRITERS.map((tw, i) => (
-            <TypewriterText key={i} {...tw} />
-          ))}
+                {/* Text pops */}
+                {TEXT_POPS.map((tp, i) => (
+                  <TextPop key={i} {...tp} />
+                ))}
 
-          {/* Text scrambles */}
-          {SCRAMBLES.map((sc, i) => (
-            <TextScramble key={i} {...sc} />
-          ))}
+                {/* Typewriter texts */}
+                {TYPEWRITERS.map((tw, i) => (
+                  <TypewriterText key={i} {...tw} />
+                ))}
 
-          {/* Gradient texts */}
-          {GRADIENT_TEXTS.map((gt, i) => (
-            <GradientText key={i} {...gt} />
-          ))}
+                {/* Text scrambles */}
+                {SCRAMBLES.map((sc, i) => (
+                  <TextScramble key={i} {...sc} />
+                ))}
 
-          {/* Word highlights */}
-          {WORD_HIGHLIGHTS.map((wh, i) => (
-            <WordHighlight key={i} {...wh} />
-          ))}
+                {/* Gradient texts */}
+                {GRADIENT_TEXTS.map((gt, i) => (
+                  <GradientText key={i} {...gt} />
+                ))}
 
-          {/* Morph texts */}
-          {MORPHS.map((mt, i) => (
-            <MorphText key={i} {...mt} />
-          ))}
+                {/* Word highlights */}
+                {WORD_HIGHLIGHTS.map((wh, i) => (
+                  <WordHighlight key={i} {...wh} />
+                ))}
 
-          {/* Countdown timers */}
-          {COUNTDOWNS.map((cd, i) => (
-            <CountdownTimer key={i} {...cd} />
-          ))}
+                {/* Morph texts */}
+                {MORPHS.map((mt, i) => (
+                  <MorphText key={i} {...mt} />
+                ))}
 
-          {/* Progress rings */}
-          {PROGRESS_RINGS.map((pr, i) => (
-            <ProgressRing key={i} {...pr} />
-          ))}
+                {/* Countdown timers */}
+                {COUNTDOWNS.map((cd, i) => (
+                  <CountdownTimer key={i} {...cd} />
+                ))}
 
-          {/* Confirm checks */}
-          {CHECKS.map((ck, i) => (
-            <ConfirmCheck key={i} {...ck} />
-          ))}
+                {/* Progress rings */}
+                {PROGRESS_RINGS.map((pr, i) => (
+                  <ProgressRing key={i} {...pr} />
+                ))}
 
-          {/* Lower thirds */}
-          {LOWER_THIRDS.map((lt, i) => (
-            <LowerThird key={i} {...lt} />
-          ))}
+                {/* Confirm checks */}
+                {CHECKS.map((ck, i) => (
+                  <ConfirmCheck key={i} {...ck} />
+                ))}
 
-          {/* Chapter markers + progress bar */}
-          <ChapterMarker
-            totalFrames={VIDEO_CONFIG.durationInFrames}
-            chapters={CHAPTERS}
-            showProgressBar={CHAPTERS.length > 0}
-          />
+                {/* Lower thirds */}
+                {LOWER_THIRDS.map((lt, i) => (
+                  <LowerThird key={i} {...lt} />
+                ))}
 
-          {/* Logo watermark */}
-          {LOGO.show && (
-            <LogoWatermark corner={LOGO.corner} fadeInFrame={LOGO.fadeInFrame} />
-          )}
+                {/* Chapter markers + progress bar */}
+                <ChapterMarker
+                  totalFrames={VIDEO_CONFIG.durationInFrames}
+                  chapters={CHAPTERS}
+                  showProgressBar={CHAPTERS.length > 0}
+                />
 
-          {/* Bullet lists */}
-          {BULLET_LISTS.map((bl, i) => (
-            <BulletList key={i} {...bl} />
-          ))}
+                {/* Logo watermark */}
+                {LOGO.show && (
+                  <LogoWatermark corner={LOGO.corner} fadeInFrame={LOGO.fadeInFrame} />
+                )}
 
-          {/* Stat cards */}
-          {STAT_CARDS.map((sc, i) => (
-            <StatCard key={i} {...sc} />
-          ))}
+                {/* Bullet lists */}
+                {BULLET_LISTS.map((bl, i) => (
+                  <BulletList key={i} {...bl} />
+                ))}
 
-          {/* Highlight boxes */}
-          {HIGHLIGHTS.map((h, i) => (
-            <HighlightBox key={i} {...h} />
-          ))}
+                {/* Stat cards */}
+                {STAT_CARDS.map((sc, i) => (
+                  <StatCard key={i} {...sc} />
+                ))}
 
-          {/* CTA buttons */}
-          {CTA_BUTTONS.map((btn, i) => (
-            <CTAButton key={i} {...btn} />
-          ))}
+                {/* Highlight boxes */}
+                {HIGHLIGHTS.map((h, i) => (
+                  <HighlightBox key={i} {...h} />
+                ))}
 
-          {/* Phone notifications — near top */}
-          {NOTIFICATIONS.map((n, i) => (
-            <PhoneNotification key={i} {...n} />
-          ))}
+                {/* CTA buttons */}
+                {CTA_BUTTONS.map((btn, i) => (
+                  <CTAButton key={i} {...btn} />
+                ))}
 
-          {/* Chat bubbles */}
-          {CHATS.map((ch, i) => (
-            <ChatBubble key={i} {...ch} />
-          ))}
+                {/* Phone notifications — near top */}
+                {NOTIFICATIONS.map((n, i) => (
+                  <PhoneNotification key={i} {...n} />
+                ))}
 
-          {/* Kinetic text — word-by-word */}
-          {KINETIC_TEXTS.map((kt, i) => (
-            <KineticText key={i} {...kt} />
-          ))}
+                {/* Chat bubbles */}
+                {CHATS.map((ch, i) => (
+                  <ChatBubble key={i} {...ch} />
+                ))}
 
-          {/* Reaction bubbles */}
-          {REACTIONS.length > 0 && <ReactionBubble reactions={REACTIONS} />}
+                {/* Kinetic text — word-by-word */}
+                {KINETIC_TEXTS.map((kt, i) => (
+                  <KineticText key={i} {...kt} />
+                ))}
 
-          {/* Floating emojis — TikTok-style */}
-          {FLOATING_EMOJIS.length > 0 && (
-            <FloatingEmoji emojis={FLOATING_EMOJIS} />
-          )}
+                {/* Reaction bubbles */}
+                {REACTIONS.length > 0 && <ReactionBubble reactions={REACTIONS} />}
 
-          {/* Punch transitions */}
-          {PUNCHES.length > 0 && <PunchTransition punches={PUNCHES} />}
+                {/* Floating emojis — TikTok-style */}
+                {FLOATING_EMOJIS.length > 0 && (
+                  <FloatingEmoji emojis={FLOATING_EMOJIS} />
+                )}
 
-          {/* Social handles */}
-          {SOCIAL_HANDLES.map((sh, i) => (
-            <SocialHandle key={i} {...sh} />
-          ))}
+                {/* Punch transitions */}
+                {PUNCHES.length > 0 && <PunchTransition punches={PUNCHES} />}
 
-          {/* Outro screen */}
-          {OUTRO.show && (
-            <OutroScreen
-              enterFrame={OUTRO.enterFrame}
-              ctaText={OUTRO.ctaText}
-              subText={OUTRO.subText}
-              linkText={OUTRO.linkText}
-            />
-          )}
+                {/* Social handles */}
+                {SOCIAL_HANDLES.map((sh, i) => (
+                  <SocialHandle key={i} {...sh} />
+                ))}
 
-          {/* Fade transitions — always last */}
-          {FADES.map((f, i) => (
-            <FadeTransition key={i} {...f} />
-          ))}
+                {/* Outro screen */}
+                {OUTRO.show && (
+                  <OutroScreen
+                    enterFrame={OUTRO.enterFrame}
+                    ctaText={OUTRO.ctaText}
+                    subText={OUTRO.subText}
+                    linkText={OUTRO.linkText}
+                  />
+                )}
 
-        </CameraShake>
+                {/* Fade transitions — always last */}
+                {FADES.map((f, i) => (
+                  <FadeTransition key={i} {...f} />
+                ))}
+
+              </CameraShake>
+            </WhipPan>
+          </ContinuousDrift>
+        </SmartZoom>
       </ZoomBurst>
     </AbsoluteFill>
   );
