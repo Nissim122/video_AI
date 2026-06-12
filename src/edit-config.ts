@@ -11,6 +11,12 @@ import type { EmojiFloat } from "./components/FloatingEmoji";
 import type { TrackingData } from "./components/TrackedOverlay";
 import type { SmartZoomEvent } from "./components/SmartZoom";
 import type { WhipPanEvent } from "./components/WhipPan";
+import type { MotionBlurEvent } from "./components/MotionBlur";
+import type { DOFEvent } from "./components/DepthOfField";
+import type { LensFlareEvent } from "./components/LensFlare";
+import type { CAEvent } from "./components/ChromaticAberration";
+import type { TextLineRevealItem } from "./components/TextLineReveal";
+import type { AnamorphicStreakEvent } from "./components/AnamorphicStreak";
 
 export const VIDEO_CONFIG = {
   src: "test-video.mp4",    // שם הקובץ ב-public/
@@ -541,11 +547,11 @@ export const WHIP_PANS: WhipPanEvent[] = [
 // zoomAmount: תוספת סקייל (ברירת מחדל 0.04 = 4%)
 // speed: מהירות האוסצילציה (ברירת מחדל 1)
 export const DRIFT = {
-  enabled:    false,
+  enabled:    true,
   mode:       "both" as const,
-  panAmount:  12,
-  zoomAmount: 0.04,
-  speed:      1,
+  panAmount:  14,
+  zoomAmount: 0.05,
+  speed:      0.8,
 };
 
 // ── 20. FloatingEmoji ─────────────────────────────────────────────────────────
@@ -628,6 +634,117 @@ export const FLOATING_EMOJIS: EmojiFloat[] = [
 //
 // SmartStack ימקם את ה-CTA ב-180px, וה-LowerThird ב-180+86+24=290px (במקום 260)
 // כדי שלא יחפף. אם אין חפיפה, כל אחד מקבל את preferredBottom שלו.
+
+// ═════════════════════════════════════════════════════════════════════════════
+// After Effects — 8 רכיבים חדשים
+// ═════════════════════════════════════════════════════════════════════════════
+
+// ── MotionBlur — blur כיווני על שכבות בתנועה ──────────────────────────────────
+// direction: "left" | "right" | "up" | "down"
+// strength: 0–3 (ברירת מחדל 1)
+export const MOTION_BLURS: MotionBlurEvent[] = [
+  { startFrame: 0,  endFrame: 22, direction: "right", strength: 1.8 }, // blur כניסה
+  { startFrame: 70, endFrame: 90, direction: "left",  strength: 1.4 }, // blur יציאה
+];
+
+// ── DepthOfField — blur רקע לפי פוקוס ─────────────────────────────────────────
+// blurAmount: עוצמת ה-blur בפיקסלים (ברירת מחדל 12)
+// vignetteEdge: כהות שוליים 0–1 (ברירת מחדל 0.35)
+export const DOF_EVENTS: DOFEvent[] = [
+  // { startFrame: 60, endFrame: 180, blurAmount: 14, vignetteEdge: 0.4 },
+];
+
+// ── LensFlare — הילה + קרניים + orbs ──────────────────────────────────────────
+// x/y: מיקום בפיקסלים | intensity: 0–2 | animated: תנועה עדינה
+export const LENS_FLARES: LensFlareEvent[] = [
+  { enterFrame: 12, exitFrame: 78, x: 820, y: 240, intensity: 1.1, color: BRAND.blueL, animated: true },
+];
+
+// ── ChromaticAberration — RGB split ───────────────────────────────────────────
+// baseIntensity: תמיד-פעיל עדין בפיקסלים (ברירת מחדל 0.8)
+// events: burst חזק בפריימים ספציפיים
+export const CA_CONFIG = {
+  enabled: true,
+  baseIntensity: 1.2,     // px — תמיד-פעיל (עדין)
+  events: [
+    { frame: 0,  intensity: 3.5, duration: 18 }, // burst כניסה חזק
+    { frame: 72, intensity: 2.5, duration: 18 }, // burst יציאה
+  ] as CAEvent[],
+};
+
+// ── TextLineReveal — AE classic: טקסט עולה מאחורי קו ─────────────────────────
+// feel: "snappy" | "smooth" | "bouncy"
+// align: "right" | "center" | "left"
+// accentWords: אינדקסים של מילים שיוצגו ב-accentColor
+export const TEXT_LINE_REVEALS: Array<{
+  lines: TextLineRevealItem[];
+  fontSize?: number;
+  lineHeight?: number;
+  positionY?: number;
+  align?: "right" | "center" | "left";
+  feel?: "snappy" | "smooth" | "bouncy";
+  showLine?: boolean;
+}> = [
+  {
+    positionY: 0.44,
+    feel: "snappy",
+    fontSize: 88,
+    align: "center",
+    showLine: true,
+    lines: [
+      { text: "חוסך 10 שעות", enterFrame: 22, accentWords: [1, 2], accentColor: BRAND.pink },
+      { text: "כל שבוע 🚀",   enterFrame: 34, color: "blue" },
+    ],
+  },
+  {
+    positionY: 0.62,
+    feel: "smooth",
+    fontSize: 48,
+    align: "center",
+    showLine: false,
+    lines: [
+      { text: "100% אוטומטי — בלי קוד", enterFrame: 48, color: "white" },
+    ],
+  },
+];
+
+// ── AnamorphicStreak — פסי אור אופקיים ────────────────────────────────────────
+// y: מיקום אנכי בפיקסלים (חובה)
+// length: חצי-אורך הפס (ברירת מחדל 520)
+// thickness: עובי ב-px (ברירת מחדל 2)
+// color: ברירת מחדל BRAND.blueL
+export const ANAMORPHIC_STREAKS: AnamorphicStreakEvent[] = [
+  { enterFrame: 8,  exitFrame: 82, y: 960,  length: 520, color: BRAND.blueL, opacity: 0.7, pulse: true },
+  { enterFrame: 20, exitFrame: 70, y: 580,  length: 320, color: BRAND.pink,  opacity: 0.5, thickness: 1.5 },
+];
+
+// ── ParallaxLayer — ב-Composition.tsx ישירות (עוטף תוכן) ────────────────────
+//
+// import { ParallaxLayer } from "./components/ParallaxLayer";
+//
+// // רקע נע לאט (depth גבוה = תנועה מהירה יותר)
+// <ParallaxLayer depth={0.9} panAmountX={50} panAmountY={25}>
+//   <GridBackground ... />
+// </ParallaxLayer>
+//
+// // אלמנט קדמי כמעט לא זז
+// <ParallaxLayer depth={0.15} panAmountX={50}>
+//   <TextPop text="כותרת" enterFrame={60} />
+// </ParallaxLayer>
+
+// ── Bloom — glow diffuse רך (ב-Composition.tsx ישירות) ───────────────────────
+//
+// import { Bloom } from "./components/Bloom";
+//
+// // גלוב סביב טקסט
+// <Bloom intensity={0.6} radius={24} color={BRAND.blueL} enterFrame={60}>
+//   <TextPop text="100% אוטומטי" enterFrame={0} />
+// </Bloom>
+//
+// // bloom כפול (soft + hard) — לאפקט קולנועי
+// <Bloom style="dual" intensity={0.5} radius={30} enterFrame={0}>
+//   <StatCard value={10000} suffix="+" label="שעות נחסכו" enterFrame={0} />
+// </Bloom>
 
 // ── TrackedOverlays — Spatial Tracking ───────────────────────────────────────
 // רכיבים שעוקבים אחרי נקודת יד זזה בוידאו (MediaPipe)

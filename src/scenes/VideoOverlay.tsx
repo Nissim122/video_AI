@@ -48,6 +48,12 @@ import { TrackedOverlay } from "../components/TrackedOverlay";
 import { SmartZoom } from "../components/SmartZoom";
 import { WhipPan } from "../components/WhipPan";
 import { ContinuousDrift } from "../components/ContinuousDrift";
+import { MotionBlur } from "../components/MotionBlur";
+import { DepthOfField } from "../components/DepthOfField";
+import { LensFlare } from "../components/LensFlare";
+import { ChromaticAberration } from "../components/ChromaticAberration";
+import { TextLineReveal } from "../components/TextLineReveal";
+import { AnamorphicStreak } from "../components/AnamorphicStreak";
 import {
   VIDEO_CONFIG, PIPS, CHAPTERS, LOGO,
   LOWER_THIRDS, TEXT_POPS, CALLOUTS, OUTRO, GRADE,
@@ -59,6 +65,9 @@ import {
   SHAKES, SPOTLIGHTS, ZOOM_BURSTS, PARTICLE_FIELD, GLOW_PULSES,
   DRAW_PATHS, COUNTDOWNS, FLOATING_EMOJIS,
   SMART_ZOOMS, WHIP_PANS, DRIFT, TRACKED_OVERLAYS,
+  // AE components
+  MOTION_BLURS, DOF_EVENTS, LENS_FLARES, CA_CONFIG,
+  TEXT_LINE_REVEALS, ANAMORPHIC_STREAKS,
 } from "../edit-config";
 
 const ICON_SIZE = 120;
@@ -166,6 +175,13 @@ export const VideoOverlay: React.FC = () => {
 
   return (
     <AbsoluteFill>
+      {/* ── AE stack: ChromaticAberration > MotionBlur > DepthOfField > Camera stack ── */}
+      <ChromaticAberration
+        baseIntensity={CA_CONFIG.enabled ? CA_CONFIG.baseIntensity : 0}
+        events={CA_CONFIG.enabled ? CA_CONFIG.events : []}
+      >
+      <MotionBlur events={MOTION_BLURS}>
+      <DepthOfField events={DOF_EVENTS}>
       {/* ── Camera stack: ZoomBurst > SmartZoom > ContinuousDrift > WhipPan > CameraShake ── */}
       <ZoomBurst bursts={ZOOM_BURSTS}>
         <SmartZoom events={SMART_ZOOMS}>
@@ -423,6 +439,21 @@ export const VideoOverlay: React.FC = () => {
                   />
                 )}
 
+                {/* Lens flares — screen blend, above everything */}
+                {LENS_FLARES.length > 0 && (
+                  <LensFlare events={LENS_FLARES} />
+                )}
+
+                {/* Anamorphic streaks */}
+                {ANAMORPHIC_STREAKS.length > 0 && (
+                  <AnamorphicStreak events={ANAMORPHIC_STREAKS} />
+                )}
+
+                {/* TextLineReveal — AE-style text reveals */}
+                {TEXT_LINE_REVEALS.map((tlr, i) => (
+                  <TextLineReveal key={i} {...tlr} />
+                ))}
+
                 {/* Fade transitions — always last */}
                 {FADES.map((f, i) => (
                   <FadeTransition key={i} {...f} />
@@ -433,6 +464,9 @@ export const VideoOverlay: React.FC = () => {
           </ContinuousDrift>
         </SmartZoom>
       </ZoomBurst>
+      </DepthOfField>
+      </MotionBlur>
+      </ChromaticAberration>
     </AbsoluteFill>
   );
 };
