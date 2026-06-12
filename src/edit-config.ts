@@ -12,12 +12,15 @@ import type { TrackingData } from "./components/TrackedOverlay";
 import type { BurstElement } from "./components/PersonBurst";
 import type { SmartZoomEvent } from "./components/SmartZoom";
 import type { WhipPanEvent } from "./components/WhipPan";
+import type { StripEvent } from "./components/StripTransition";
+import type { IrisEvent } from "./components/IrisTransition";
 import type { MotionBlurEvent } from "./components/MotionBlur";
 import type { DOFEvent } from "./components/DepthOfField";
 import type { LensFlareEvent } from "./components/LensFlare";
 import type { CAEvent } from "./components/ChromaticAberration";
 import type { TextLineRevealItem } from "./components/TextLineReveal";
 import type { AnamorphicStreakEvent } from "./components/AnamorphicStreak";
+import type { AETextProps } from "./components/AEText";
 
 export const VIDEO_CONFIG = {
   src: "chofshi.mp4",    // שם הקובץ ב-public/
@@ -827,3 +830,81 @@ export const TRACKED_OVERLAYS: Array<{
   //   exitFrame: 180,
   // },
 ];
+
+// ── AEText — After Effects style "Rise Up" per-character animation ────────────
+// כל אות עולה מתוך clip mask עם spring overshoot, motion blur ו-scaleY squish
+//
+// mode:     "chars" (ברירת מחדל) — כל אות עצמאית | "words" — כל מילה עצמאית
+// stagger:  פריימים בין יחידה ליחידה (ברירת מחדל 3)
+// bounce:   0 = ללא overshoot | 1 = AE ברירת מחדל | 2 = קפצני מאוד
+// tracking: true = רווח אותיות מתכווץ בזמן הכניסה (AE tracking animator)
+// positionY: 0–1 (שבר גובה המסך)
+//
+// דוגמה בסיסית:
+//   { text: "חוסך 10 שעות", enterFrame: 60 }
+//
+// עם accent על אות ספציפית (mode: chars, מחושב לפי אינדקס):
+//   { text: "100% אוטומטי", enterFrame: 120, accentIndices: [0, 1, 2] }
+//
+// per-word עם bounce:
+//   { text: "שנה את העסק שלך", enterFrame: 90, mode: "words", bounce: 1.5, stagger: 8 }
+export const AE_TEXTS: AETextProps[] = [
+  // { text: "חוסך 10 שעות", enterFrame: 60, positionY: 0.3 },
+];
+
+// ═════════════════════════════════════════════════════════════════════════════
+// מעברים — Transitions
+// ═════════════════════════════════════════════════════════════════════════════
+
+// ── StripTransition — רצועות/lamellas נפתחות (כמו ב-Premiere) ────────────────
+// strips: מספר רצועות (ברירת מחדל 8)
+// direction: "left" | "right" | "up" | "down" — מאיזה כיוון הרצועות מגיעות
+// mode: "in" = רצועות מכסות (מעבר לתוך שחור) | "out" = נפתחות (חשיפה)
+// feel: "snappy" | "smooth" | "bouncy"
+//
+// שימוש טיפוסי — מעבר כפול (כיסוי + חשיפה):
+//   { triggerFrame: 150, mode: "in",  direction: "right" }  ← כיסוי
+//   { triggerFrame: 172, mode: "out", direction: "left"  }  ← חשיפה
+export const STRIP_TRANSITIONS: StripEvent[] = [
+  // { triggerFrame: 150, durationFrames: 22, strips: 8, direction: "right", mode: "in",  feel: "snappy" },
+  // { triggerFrame: 172, durationFrames: 22, strips: 8, direction: "left",  mode: "out", feel: "snappy" },
+];
+
+// ── IrisTransition — עיגול/Iris נפתח או נסגר ──────────────────────────────────
+// mode: "open" = עיגול גדל וחושף | "close" = עיגול מתכווץ ומכסה
+// cx/cy: מרכז העיגול בפיקסלים (ברירת מחדל: מרכז המסך)
+// feel: "snappy" | "smooth"
+export const IRIS_TRANSITIONS: IrisEvent[] = [
+  // { triggerFrame: 0,   durationFrames: 30, mode: "open",  color: "#000000", feel: "smooth" },
+  // { triggerFrame: 840, durationFrames: 30, mode: "close", color: "#000000", feel: "snappy" },
+  // { triggerFrame: 150, durationFrames: 20, cx: 540, cy: 400, mode: "close", color: "#0e1628" },
+];
+
+// ── ZoomTransition — זום-אאוט מסצנה אחת לשנייה ────────────────────────────────
+// שימוש ישיר ב-Composition.tsx בלבד (עוטף שני children):
+//
+// import { ZoomTransition } from "./components/ZoomTransition";
+//
+// <ZoomTransition
+//   triggerFrame={300}          // frame החיתוך (10 לפני = zoom-out, 10 אחרי = zoom-in)
+//   durationFrames={20}         // סה"כ אורך המעבר
+//   scaleAmount={1.5}           // כמה מוזמת הסצנה הנכנסת בהתחלה
+//   feel="snappy"
+//   flashColor="#ffffff"        // הבזק בחיתוך — null להשבית
+//   outgoing={<SceneA />}       // הסצנה שמתרחקת (zoom-out)
+//   incoming={<SceneB />}       // הסצנה שמתקרבת (zoom-in)
+// />
+
+// ── SlidePush — דחיפה אופקית/אנכית ───────────────────────────────────────────
+// שימוש ישיר ב-Composition.tsx בלבד (עוטף שני children):
+//
+// import { SlidePush } from "./components/SlidePush";
+//
+// <SlidePush
+//   triggerFrame={300}          // frame תחילת הדחיפה
+//   durationFrames={18}         // אורך המעבר
+//   direction="right"           // מאיזה כיוון הסצנה החדשה נכנסת
+//   feel="snappy"
+//   outgoing={<SceneA />}       // הסצנה שנדחפת החוצה
+//   incoming={<SceneB />}       // הסצנה שנכנסת ודוחפת
+// />

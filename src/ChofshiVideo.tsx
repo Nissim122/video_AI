@@ -7,6 +7,13 @@ import {
   OffthreadVideo,
   staticFile,
 } from "remotion";
+import { PersonBurst } from "./components/PersonBurst";
+
+const BRAND = {
+  pink:   "#e0176b",
+  blueL:  "#2db3cd",
+  green:  "#28c76f",
+};
 
 // ── Aurora blobs — iridescent glow overlay for first 5 seconds ───────────────
 const AuroraEffect: React.FC<{ frame: number }> = ({ frame }) => {
@@ -123,6 +130,19 @@ export const ChofshiVideo: React.FC = () => {
 
       {/* Aurora overlay — frames 0–150 (5 sec), blend mode: screen */}
       <AuroraEffect frame={frame} />
+
+      {/* Text elements bursting from behind the speaker */}
+      <PersonBurst
+        personX={0.5}
+        personY={0.55}
+        enterFrame={45}
+        stagger={12}
+        elements={[
+          { type: "text", text: "חוסך 10 שעות", targetX: 0.14, targetY: 0.28, color: BRAND.blueL, holdFrames: 90 },
+          { type: "text", text: "100% אוטומטי",  targetX: 0.86, targetY: 0.31, color: BRAND.pink,  holdFrames: 90 },
+          { type: "text", text: "ללא קוד",        targetX: 0.5,  targetY: 0.76, color: BRAND.green, holdFrames: 90 },
+        ]}
+      />
     </AbsoluteFill>
   );
 };

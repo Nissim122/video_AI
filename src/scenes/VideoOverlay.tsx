@@ -55,6 +55,7 @@ import { ChromaticAberration } from "../components/ChromaticAberration";
 import { TextLineReveal } from "../components/TextLineReveal";
 import { AnamorphicStreak } from "../components/AnamorphicStreak";
 import { PersonBurst } from "../components/PersonBurst";
+import { AEText } from "../components/AEText";
 import {
   VIDEO_CONFIG, PIPS, CHAPTERS, LOGO,
   LOWER_THIRDS, TEXT_POPS, CALLOUTS, OUTRO, GRADE,
@@ -70,6 +71,7 @@ import {
   MOTION_BLURS, DOF_EVENTS, LENS_FLARES, CA_CONFIG,
   TEXT_LINE_REVEALS, ANAMORPHIC_STREAKS,
   PERSON_BURSTS,
+  AE_TEXTS,
 } from "../edit-config";
 
 const ICON_SIZE = 120;
@@ -459,6 +461,11 @@ export const VideoOverlay: React.FC = () => {
                 {/* TextLineReveal — AE-style text reveals */}
                 {TEXT_LINE_REVEALS.map((tlr, i) => (
                   <TextLineReveal key={i} {...tlr} />
+                ))}
+
+                {/* AEText — After Effects Rise Up per-character animation */}
+                {AE_TEXTS.map((ae, i) => (
+                  <AEText key={i} {...ae} />
                 ))}
 
                 {/* Fade transitions — always last */}

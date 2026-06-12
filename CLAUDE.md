@@ -1,6 +1,22 @@
 # Clix Video AI — Project Instructions
 
+## כלל עבודה בסיסי
+
+כל פעולה שניתן לבצע ללא קלט מהמשתמש — מבצעים אוטומטית. לא שואלים "האם להריץ?", לא מבקשים אישור על פקודות רגילות, לא מחכים לאישור לפני צעד הגיוני הבא. פועלים עד לסיום המשימה ומדווחים על התוצאה.
+
 ## סגמנטציה — segment_person.py
+
+### מודל ברירת מחדל — `birefnet-general`
+
+כאשר יש אלמנט שצריך להופיע **מאחורי אדם בסרטון** — **תמיד** להשתמש במודל `birefnet-general`:
+
+```python
+session = new_session("birefnet-general")
+```
+
+**למה:** המדויק ביותר לאנשים עם בגדים בהירים/לבנים על רקע מורכב. מודלים אחרים (`isnet-general-use`, `u2net_human_seg`) יוצרים חורים בחולצה ונראה שזה עריכה. לא לשנות מודל בלי סיבה מפורשת.
+
+### תיקון צבע — חובה
 
 בכל שימוש ב-`cv2.imdecode` על פלט של `rembg` — **חובה** לתקן ערוצי צבע:
 
@@ -299,6 +315,62 @@ fontSize: 70, letterSpacing: "-0.02em", color: BRAND.pink
 ## ספריית רכיבים חדשים — `src/components/` (20 רכיבים נוספים)
 
 ### קטגוריה א — אפקטי טקסט
+
+### AEText ⭐ — After Effects "Rise Up" per-character
+הרכיב האיכותי ביותר לטקסט. כל תו עולה מתוך clip mask עם spring overshoot, motion blur ו-scaleY squish — בדיוק כמו AE.
+
+**מתי להשתמש:** כשצריך טקסט שנראה professional ולא כמו Remotion basic. עדיף על TextStagger לכל טקסט ראשי.
+
+**הבדלים מ-TextStagger:**
+- clip reveal (תו עולה מתוך מסכה, לא רק fade)
+- motion blur (filter blur 9px→0 בזמן תנועה)
+- scaleY squish (אות מתמתחת: 0.6→1.08→1)
+- תיקון bidi — מספרים/לטינית בתוך עברית מוצגים בסדר נכון
+
+```tsx
+// בסיסי — chars mode (ברירת מחדל)
+<AEText text="חוסך 10 שעות" enterFrame={60} positionY={0.3} />
+
+// עם bounce גבוה וצביעת אינדקסים
+<AEText
+  text="100% אוטומטי"
+  enterFrame={90}
+  bounce={1.3}
+  accentIndices={[0, 1, 2, 3]}  // 100% בצבע accentColor
+  accentColor={BRAND.pink}
+  positionY={0.35}
+/>
+
+// per-word (מילים נכנסות כיחידה)
+<AEText
+  text="חוסך זמן ומשאבים"
+  enterFrame={120}
+  mode="words"
+  stagger={8}
+  bounce={1.2}
+  positionY={0.5}
+/>
+
+// עם tracking animator (letter-spacing מתכווץ)
+<AEText text="CLIX" enterFrame={60} tracking={true} fontFamily="'Inter', sans-serif" fontSize={140} />
+```
+
+**Props:**
+- `mode`: `"chars"` (ברירת מחדל) | `"words"`
+- `stagger`: פריימים בין יחידות (ברירת מחדל 3)
+- `bounce`: `0`=ללא overshoot | `1`=AE default | `2`=קפצני מאוד
+- `tracking`: `true` → letter-spacing מתכווץ בכניסה
+- `accentIndices`: אינדקסים לצבע שונה (לפי unit, לא תו מקורי)
+
+**הגדרה ב-edit-config:**
+```ts
+AE_TEXTS: [
+  { text: "חוסך 10 שעות", enterFrame: 60, positionY: 0.3 },
+  { text: "100% אוטומטי", enterFrame: 120, accentIndices: [0,1,2,3], positionY: 0.5 },
+]
+```
+
+---
 
 ### FlipText
 לוח split-flap — כל תו מתהפך לתו הסופי בזה אחר זה.

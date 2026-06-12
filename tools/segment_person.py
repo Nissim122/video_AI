@@ -1,7 +1,7 @@
 """
 segment_person.py
 -----------------
-Processes chofshi.mp4 frame-by-frame using rembg (U2Net AI),
+Processes chofshi.mp4 frame-by-frame using rembg (isnet-general-use),
 produces a WebM (VP9 + alpha) where the background is transparent.
 
 Output: public/chofshi_masked.webm
@@ -19,6 +19,36 @@ INPUT  = os.path.join(os.path.dirname(__file__), "..", "public", "chofshi.mp4")
 FRAMES = os.path.join(os.path.dirname(__file__), "..", "public", "_seg_frames")
 OUTPUT = os.path.join(os.path.dirname(__file__), "..", "public", "chofshi_masked.webm")
 
+
+def refine_mask(img: np.ndarray) -> np.ndarray:
+    """Fill holes (incl. light-shirt holes) in alpha using large close + flood-fill."""
+    alpha = img[:, :, 3]
+
+    _, binary = cv2.threshold(alpha, 10, 255, cv2.THRESH_BINARY)
+
+    # Large closing bridges gaps caused by white/light clothing
+    kernel_big = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (80, 80))
+    closed = cv2.morphologyEx(binary, cv2.MORPH_CLOSE, kernel_big)
+
+    # Flood-fill from padded border → all unreached interior pixels are holes
+    h, w = closed.shape
+    padded = cv2.copyMakeBorder(closed, 1, 1, 1, 1, cv2.BORDER_CONSTANT, value=0)
+    flood_mask = np.zeros((h + 4, w + 4), np.uint8)
+    cv2.floodFill(padded, flood_mask, (0, 0), 255)
+    interior_holes = cv2.bitwise_not(padded[1:-1, 1:-1])
+    filled = cv2.bitwise_or(closed, interior_holes)
+
+    # Smooth edges only (preserve hard interior)
+    kernel_edge = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11))
+    smooth = cv2.GaussianBlur(filled, (7, 7), 0)
+    edge = cv2.absdiff(filled, cv2.erode(filled, kernel_edge))
+    edge = (edge > 10).astype(np.uint8) * 255
+    alpha_final = np.where(edge > 0, smooth, filled)
+
+    img[:, :, 3] = alpha_final
+    return img
+
+
 def main():
     cap = cv2.VideoCapture(INPUT)
     if not cap.isOpened():
@@ -31,26 +61,30 @@ def main():
 
     os.makedirs(FRAMES, exist_ok=True)
 
-    print("Loading AI model (u2net_human_seg)...")
-    session = new_session("u2net_human_seg")
+    # isnet-general-use — fast model; refine_mask fills holes in light clothing
+    print("Loading AI model (isnet-general-use)...")
+    session = new_session("isnet-general-use")
 
+    MAX_FRAMES = 210  # 7 seconds at 30fps
     frame_idx = 0
     while True:
         ret, frame = cap.read()
-        if not ret:
+        if not ret or frame_idx >= MAX_FRAMES:
             break
 
         # rembg expects RGB PNG bytes
         _, png_buf = cv2.imencode(".png", cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
         result_bytes = remove(png_buf.tobytes(), session=session)
 
-        # Decode result (RGBA PNG)
+        # Decode result — keep as BGRA (imencode expects BGRA for correct PNG output)
         result_arr = np.frombuffer(result_bytes, np.uint8)
-        rgba = cv2.imdecode(result_arr, cv2.IMREAD_UNCHANGED)  # BGRA
+        bgra = cv2.imdecode(result_arr, cv2.IMREAD_UNCHANGED)
+
+        # Post-process: fill holes + smooth edges (only touches channel 3 = alpha)
+        bgra = refine_mask(bgra)
 
         out_path = os.path.join(FRAMES, f"frame_{frame_idx:05d}.png")
-        # cv2.imwrite fails silently on Hebrew/non-ASCII paths on Windows
-        success, buf = cv2.imencode(".png", rgba)
+        success, buf = cv2.imencode(".png", bgra)
         if success:
             with open(out_path, "wb") as fh:
                 fh.write(buf.tobytes())
@@ -85,7 +119,6 @@ def main():
 
     print(f"Done!  →  {OUTPUT}")
 
-    # Cleanup temp frames
     import shutil
     shutil.rmtree(FRAMES)
     print("Temp frames cleaned up.")
