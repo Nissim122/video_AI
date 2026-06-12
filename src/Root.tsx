@@ -7,6 +7,7 @@ import { PhoneEntrance, PhoneVariant } from "./components/PhoneEntrance";
 import { loadFont } from "@remotion/google-fonts/Heebo";
 import { BRAND } from "./brand";
 import { VideoOverlay } from "./scenes/VideoOverlay";
+import { ChofshiVideo } from "./ChofshiVideo";
 
 const { fontFamily } = loadFont();
 
@@ -68,6 +69,14 @@ const PhoneShowcase: React.FC = () => (
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      <Composition
+        id="ChofshiVideo"
+        component={ChofshiVideo}
+        durationInFrames={1363}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
       <Composition
         id="VideoOverlay"
         component={VideoOverlay}

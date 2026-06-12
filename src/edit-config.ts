@@ -9,6 +9,7 @@ import type { ZoomBurstEvent } from "./components/ZoomBurst";
 import type { ChatMessage } from "./components/ChatBubble";
 import type { EmojiFloat } from "./components/FloatingEmoji";
 import type { TrackingData } from "./components/TrackedOverlay";
+import type { BurstElement } from "./components/PersonBurst";
 import type { SmartZoomEvent } from "./components/SmartZoom";
 import type { WhipPanEvent } from "./components/WhipPan";
 import type { MotionBlurEvent } from "./components/MotionBlur";
@@ -19,7 +20,7 @@ import type { TextLineRevealItem } from "./components/TextLineReveal";
 import type { AnamorphicStreakEvent } from "./components/AnamorphicStreak";
 
 export const VIDEO_CONFIG = {
-  src: "test-video.mp4",    // שם הקובץ ב-public/
+  src: "chofshi.mp4",    // שם הקובץ ב-public/
   fps: 30,
   durationInFrames: 900,    // עדכן לאורך האמיתי של הסרטון × fps
   width: 1080,
@@ -547,11 +548,11 @@ export const WHIP_PANS: WhipPanEvent[] = [
 // zoomAmount: תוספת סקייל (ברירת מחדל 0.04 = 4%)
 // speed: מהירות האוסצילציה (ברירת מחדל 1)
 export const DRIFT = {
-  enabled:    true,
+  enabled:    false,
   mode:       "both" as const,
-  panAmount:  14,
-  zoomAmount: 0.05,
-  speed:      0.8,
+  panAmount:  12,
+  zoomAmount: 0.04,
+  speed:      1,
 };
 
 // ── 20. FloatingEmoji ─────────────────────────────────────────────────────────
@@ -643,8 +644,8 @@ export const FLOATING_EMOJIS: EmojiFloat[] = [
 // direction: "left" | "right" | "up" | "down"
 // strength: 0–3 (ברירת מחדל 1)
 export const MOTION_BLURS: MotionBlurEvent[] = [
-  { startFrame: 0,  endFrame: 22, direction: "right", strength: 1.8 }, // blur כניסה
-  { startFrame: 70, endFrame: 90, direction: "left",  strength: 1.4 }, // blur יציאה
+  // { startFrame: 60, endFrame: 90, direction: "right", strength: 1.5 },
+  // { startFrame: 210, endFrame: 230, direction: "left", strength: 1 },
 ];
 
 // ── DepthOfField — blur רקע לפי פוקוס ─────────────────────────────────────────
@@ -657,19 +658,21 @@ export const DOF_EVENTS: DOFEvent[] = [
 // ── LensFlare — הילה + קרניים + orbs ──────────────────────────────────────────
 // x/y: מיקום בפיקסלים | intensity: 0–2 | animated: תנועה עדינה
 export const LENS_FLARES: LensFlareEvent[] = [
-  { enterFrame: 12, exitFrame: 78, x: 820, y: 240, intensity: 1.1, color: BRAND.blueL, animated: true },
+  // { enterFrame: 0, x: 780, y: 280, intensity: 0.9 },
+  // { enterFrame: 120, exitFrame: 240, x: 200, y: 400, intensity: 0.7 },
 ];
 
 // ── ChromaticAberration — RGB split ───────────────────────────────────────────
 // baseIntensity: תמיד-פעיל עדין בפיקסלים (ברירת מחדל 0.8)
 // events: burst חזק בפריימים ספציפיים
 export const CA_CONFIG = {
-  enabled: true,
-  baseIntensity: 1.2,     // px — תמיד-פעיל (עדין)
-  events: [
-    { frame: 0,  intensity: 3.5, duration: 18 }, // burst כניסה חזק
-    { frame: 72, intensity: 2.5, duration: 18 }, // burst יציאה
-  ] as CAEvent[],
+  enabled: false,
+  baseIntensity: 0.8,     // px — תמיד-פעיל
+  events: [] as CAEvent[],
+  // events: [
+  //   { frame: 90,  intensity: 2.5, duration: 12 },
+  //   { frame: 210, intensity: 3,   duration: 8  },
+  // ],
 };
 
 // ── TextLineReveal — AE classic: טקסט עולה מאחורי קו ─────────────────────────
@@ -685,27 +688,14 @@ export const TEXT_LINE_REVEALS: Array<{
   feel?: "snappy" | "smooth" | "bouncy";
   showLine?: boolean;
 }> = [
-  {
-    positionY: 0.44,
-    feel: "snappy",
-    fontSize: 88,
-    align: "center",
-    showLine: true,
-    lines: [
-      { text: "חוסך 10 שעות", enterFrame: 22, accentWords: [1, 2], accentColor: BRAND.pink },
-      { text: "כל שבוע 🚀",   enterFrame: 34, color: "blue" },
-    ],
-  },
-  {
-    positionY: 0.62,
-    feel: "smooth",
-    fontSize: 48,
-    align: "center",
-    showLine: false,
-    lines: [
-      { text: "100% אוטומטי — בלי קוד", enterFrame: 48, color: "white" },
-    ],
-  },
+  // {
+  //   positionY: 0.45,
+  //   feel: "snappy",
+  //   lines: [
+  //     { text: "חוסך 10 שעות בשבוע", enterFrame: 60, accentWords: [1, 2], accentColor: "#e0176b" },
+  //     { text: "בלי קוד. בלי כאב ראש.", enterFrame: 80, color: "blue" },
+  //   ],
+  // },
 ];
 
 // ── AnamorphicStreak — פסי אור אופקיים ────────────────────────────────────────
@@ -714,8 +704,8 @@ export const TEXT_LINE_REVEALS: Array<{
 // thickness: עובי ב-px (ברירת מחדל 2)
 // color: ברירת מחדל BRAND.blueL
 export const ANAMORPHIC_STREAKS: AnamorphicStreakEvent[] = [
-  { enterFrame: 8,  exitFrame: 82, y: 960,  length: 520, color: BRAND.blueL, opacity: 0.7, pulse: true },
-  { enterFrame: 20, exitFrame: 70, y: 580,  length: 320, color: BRAND.pink,  opacity: 0.5, thickness: 1.5 },
+  // { enterFrame: 30, y: 960,  length: 480, opacity: 0.65 },
+  // { enterFrame: 90, exitFrame: 180, y: 440, color: "#e0176b", length: 320 },
 ];
 
 // ── ParallaxLayer — ב-Composition.tsx ישירות (עוטף תוכן) ────────────────────
@@ -768,6 +758,50 @@ export const ANAMORPHIC_STREAKS: AnamorphicStreakEvent[] = [
 //
 // type: "callout" | "glow" | "emoji"
 // offsetX/Y: הזזה בפיקסלים מנקודת המעקב (למשל offsetY: -100 = 100px מעל היד)
+// ── PersonBurst — אלמנטים שצצים מאחורי דמות (ללא גרין-סקרין) ─────────────────
+//
+// האשליה עובדת כך:
+//   • כל אלמנט מתחיל ב-scale 0 + blur גבוה בנקודת הדמות (personX/Y)
+//   • spring מנייד אותו לנקודת היעד (targetX/Y) תוך התחדדות ורוחב
+//   • stagger בין אלמנטים מייצר אפקט "פריצה מאחורה" רציפה
+//
+// personX/Y: 0–1, מיקום הדמות על המסך (0.5, 0.55 = מרכז, קצת מתחת)
+// targetX/Y: 0–1, לאן האלמנט נוסע
+// stagger: פריימים בין כל אלמנט (ברירת מחדל 7)
+//
+// דוגמה — 3 אלמנטים שיוצאים מאחורי דמות שעומדת במרכז:
+// {
+//   personX: 0.5, personY: 0.55,
+//   enterFrame: 60,
+//   stagger: 8,
+//   elements: [
+//     { type: "stat",  value: 10, suffix: "×", label: "יותר מהיר", targetX: 0.18, targetY: 0.35, color: BRAND.blueL },
+//     { type: "text",  text: "100% אוטומטי",                        targetX: 0.82, targetY: 0.38, color: BRAND.pink  },
+//     { type: "badge", text: "AI", label: "מבוסס",                  targetX: 0.5,  targetY: 0.22, color: BRAND.green },
+//     { type: "icon",  text: "🚀",                                   targetX: 0.15, targetY: 0.65, holdFrames: 80     },
+//   ],
+// }
+export const PERSON_BURSTS: Array<{
+  personX?: number;
+  personY?: number;
+  enterFrame: number;
+  stagger?: number;
+  elements: BurstElement[];
+}> = [
+  // {
+  //   personX: 0.5,    // 0–1 — מיקום הדמות אופקית (0.5 = מרכז)
+  //   personY: 0.55,   // 0–1 — מיקום הדמות אנכית (0.55 = קצת מתחת לאמצע = טורסו)
+  //   enterFrame: 60,
+  //   stagger: 7,      // פריימים בין כל אלמנט
+  //   elements: [
+  //     { type: "stat",  value: 10, suffix: "×",  label: "יותר מהיר",  targetX: 0.15, targetY: 0.32 },
+  //     { type: "text",  text: "100% אוטומטי",                          targetX: 0.82, targetY: 0.38, color: "#e0176b" },
+  //     { type: "badge", text: "AI", label: "מבוסס",                    targetX: 0.5,  targetY: 0.2,  color: "#28c76f" },
+  //     { type: "icon",  text: "🚀",                                     targetX: 0.82, targetY: 0.68, holdFrames: 80   },
+  //   ],
+  // },
+];
+
 export const TRACKED_OVERLAYS: Array<{
   data: TrackingData;
   type: "callout" | "glow" | "emoji";

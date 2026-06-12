@@ -27,7 +27,11 @@
     "dev": "remotion studio",
     "build": "remotion bundle",
     "upgrade": "remotion upgrade",
-    "lint": "eslint src && tsc"
+    "lint": "eslint src && tsc",
+    "ss": "node screenshot.mjs",
+    "ss:overlay": "node screenshot.mjs VideoOverlay",
+    "ss:chofshi": "node screenshot.mjs ChofshiVideo",
+    "ss:main": "node screenshot.mjs MyComp"
   },
   "sideEffects": [
     "*.css"

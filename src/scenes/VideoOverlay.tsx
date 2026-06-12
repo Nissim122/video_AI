@@ -54,6 +54,7 @@ import { LensFlare } from "../components/LensFlare";
 import { ChromaticAberration } from "../components/ChromaticAberration";
 import { TextLineReveal } from "../components/TextLineReveal";
 import { AnamorphicStreak } from "../components/AnamorphicStreak";
+import { PersonBurst } from "../components/PersonBurst";
 import {
   VIDEO_CONFIG, PIPS, CHAPTERS, LOGO,
   LOWER_THIRDS, TEXT_POPS, CALLOUTS, OUTRO, GRADE,
@@ -68,6 +69,7 @@ import {
   // AE components
   MOTION_BLURS, DOF_EVENTS, LENS_FLARES, CA_CONFIG,
   TEXT_LINE_REVEALS, ANAMORPHIC_STREAKS,
+  PERSON_BURSTS,
 } from "../edit-config";
 
 const ICON_SIZE = 120;
@@ -314,6 +316,11 @@ export const VideoOverlay: React.FC = () => {
                       ) : null
                     }
                   </TrackedOverlay>
+                ))}
+
+                {/* Person burst — elements emerging from behind speaker */}
+                {PERSON_BURSTS.map((pb, i) => (
+                  <PersonBurst key={i} {...pb} />
                 ))}
 
                 {/* Text pops */}
