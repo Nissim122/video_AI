@@ -1,5 +1,20 @@
 # Clix Video AI — Project Instructions
 
+## סגמנטציה — segment_person.py
+
+בכל שימוש ב-`cv2.imdecode` על פלט של `rembg` — **חובה** לתקן ערוצי צבע:
+
+```python
+# cv2.imdecode קורא RGBA כ-BGRA — מתקנים ידנית:
+bgra = cv2.imdecode(result_arr, cv2.IMREAD_UNCHANGED)
+b, g, r, a = cv2.split(bgra)
+rgba = cv2.merge([r, g, b, a])
+```
+
+**למה:** OpenCV תמיד מחליף R ו-B בקריאה. בלי התיקון — גוון העור יוצא כחול.
+
+---
+
 ## תיעוד חיצוני
 
 - [Remotion Docs](https://www.remotion.dev/docs) — API רשמי, hooks, components, rendering
@@ -585,6 +600,156 @@ export const CTA_BUTTONS = [
   { text: "לפרטים נוספים", enterFrame: 600, holdFrames: 180 },
 ];
 export const OUTRO = { show: true, enterFrame: 820, ctaText: "...", subText: "...", linkText: "clixautomations.com" };
+```
+
+---
+
+## ספריות חיצוניות — מתי להשתמש
+
+### כלל עליון
+> לפני שמושכים ספרייה חיצונית — בדוק אם יש רכיב קיים ב-`src/components/` שעונה על הצורך.  
+> הספריות החיצוניות הן להרחבה ולאפקטים שאין ברכיבים הקיימים.
+
+---
+
+### SVG ונתיבים מונפשים
+**`@remotion/paths`** — כשצריך לאניים נתיב SVG שמצייר את עצמו (חץ, קו זרימה, מסלול).  
+`evolvePath(progress, pathString)` מחזיר `{strokeDasharray, strokeDashoffset}` שמיושמים ישירות על `style` של אלמנט `<path>`.
+
+```tsx
+import { evolvePath } from "@remotion/paths";
+const progress = interpolate(frame, [enterFrame, enterFrame + 60], [0, 1], { extrapolateRight: "clamp" });
+const { strokeDasharray, strokeDashoffset } = evolvePath(progress, "M 0 0 C 200 0 200 300 400 300");
+<path d="M 0 0 C 200 0 200 300 400 300" style={{ strokeDasharray, strokeDashoffset, stroke: BRAND.blue, fill: "none", strokeWidth: 3 }} />
+```
+
+פונקציות נוספות: `getLength(pathString)`, `getPointAtLength(pathString, len)`, `getTangentAtLength`, `interpolatePath`, `warpPath`.
+
+**`@remotion/shapes`** — כשצריך צורה גיאומטרית (עיגול, כוכב, משולש, לב, עוגה) כ-SVG מוכן.  
+כל צורה קיימת בשתי צורות: **React component** (Arrow, Circle, Ellipse, Heart, Pie, Polygon, Rect, Star, Triangle) ו-**make\* function** שמחזיר `{ path, width, height }` לשימוש עצמאי ב-`<path d={...}>`.
+
+```tsx
+import { Star, makeStar } from "@remotion/shapes";
+// כ-component:
+<Star points={5} innerRadius={40} outerRadius={80} fill={BRAND.pink} stroke="none" />
+// כ-path string:
+const { path } = makeStar({ points: 5, innerRadius: 40, outerRadius: 80 });
+```
+
+---
+
+### אנימציות מוכנות
+**`@remotion/lottie`** — כשיש קובץ `.json` של Lottie (מ-LottieFiles).  
+```tsx
+import { Lottie, getLottieMetadata } from "@remotion/lottie";
+<Lottie animationData={data} playbackRate={1} />
+```
+
+**`@remotion/rive`** — כשיש קובץ `.riv` (Rive). יותר חזק מ-Lottie — תומך ב-state machines.  
+הייצוא הוא `RemotionRiveCanvas` (לא `RemotionRive`):
+```tsx
+import { RemotionRiveCanvas } from "@remotion/rive";
+<RemotionRiveCanvas src={staticFile("animation.riv")} artboard="main" />
+```
+
+---
+
+### 3D — מתי ואיך
+השתמש ב-3D רק כשצריך עומק/סיבוב/חלקיקים תלת-ממדיים אמיתיים.  
+לאפקטים שטוחים (zoom, scale, rotate 2D) — השתמש ב-CSS transform רגיל.
+
+`@remotion/three` מייצא: `ThreeCanvas`, `useVideoTexture`, `useOffthreadVideoTexture`.
+
+```tsx
+import { ThreeCanvas } from "@remotion/three";
+const frame = useCurrentFrame();
+
+<ThreeCanvas width={1080} height={1920}>
+  <ambientLight />
+  <mesh rotation={[0, frame * 0.05, 0]}>
+    <boxGeometry />
+    <meshStandardMaterial color={BRAND.blue} />
+  </mesh>
+</ThreeCanvas>
+```
+
+**`@react-three/drei`** — helpers ל-Three: `Text3D`, `Float`, `Sparkles`, `Environment`, `MeshDistortMaterial`, `OrbitControls`.  
+**`@react-three/postprocessing`** — אפקטי post. כל האפקטים הזמינים:  
+`Bloom`, `ChromaticAberration`, `DepthOfField`, `Glitch`, `GodRays`, `Vignette`, `TiltShift`, `Noise`, `Outline`, `LensFlare`, `N8AO`, `SSAO`, `BrightnessContrast`, `HueSaturation`, `FXAA`, `SMAA`, `Pixelation`, `Scanline`, `Sepia`, `ColorDepth`.
+
+```tsx
+import { EffectComposer, Bloom, ChromaticAberration, Vignette } from "@react-three/postprocessing";
+// בתוך ThreeCanvas:
+<EffectComposer>
+  <Bloom luminanceThreshold={0.5} intensity={1.2} mipmapBlur />
+  <ChromaticAberration offset={[0.002, 0.002]} />
+  <Vignette eskil={false} offset={0.3} darkness={0.8} />
+</EffectComposer>
+```
+
+**חשוב:** `@react-three/fiber` משתמש ב-`useFrame` — **אסור** בתוך Remotion. תמיד `useCurrentFrame()` במקום.
+
+---
+
+### ויזואליזציה של נתונים
+**`d3`** — כשצריך גרף/chart/flow שאין ב-`DashboardCard` הקיים (pie, line, network, tree, map).  
+חשוב: השבת אנימציות מובנות של d3, הנע הכל עם `frame`:
+```tsx
+import * as d3 from "d3";
+const arc = d3.arc().innerRadius(80).outerRadius(140);
+const pie = d3.pie<number>().value(d => d)([30, 50, 20]);
+const progress = interpolate(frame, [enterFrame, enterFrame + 60], [0, 1], { extrapolateRight: "clamp" });
+```
+
+---
+
+### צבע מתקדם
+**`chroma-js`** — כשצריך gradient דינמי בין צבעים, color scale לנתונים, blending.  
+```tsx
+import chroma from "chroma-js";
+const color = chroma.mix(BRAND.blue, BRAND.pink, progress).hex();
+const palette = chroma.scale([BRAND.blue, BRAND.green]).colors(5);
+```
+
+**`culori`** — כשצריך פעולות ב-color spaces מתקדמים (OKLCH, Lab) לגרדיאנטים פרסופטואליים.  
+```ts
+import { interpolate as lerpColor, formatHex } from "culori";
+const lerp = lerpColor("oklch");
+const mid = formatHex(lerp(BRAND.blue, BRAND.pink, progress));
+```
+
+---
+
+### סגנון Sketch / Hand-Drawn
+**`roughjs`** — כשצריך מראה "שרטוט יד" לצורות, חצים, מסגרות.  
+תומך ב-`.svg()` (לשימוש ב-React) וב-`.canvas()`. ב-Remotion עדיף `.generator()` לחישוב paths מראש:
+```tsx
+import rough from "roughjs";
+// שימוש עם SVG:
+const gen = rough.generator();
+const rect = gen.rectangle(10, 10, 200, 100, { roughness: 1.5, stroke: BRAND.blue });
+// rect.sets[0].ops → מערך פעולות לציור
+```
+
+---
+
+### פיזיקה
+**`matter-js`** — כשצריך נפילות, התנגשויות, קפיצות של אלמנטים.  
+מודולים עיקריים: `Engine`, `Bodies`, `Body`, `Composite`, `Composites`, `Constraint`, `Runner`, `Events`, `Vector`.  
+**חשוב:** Remotion לא מריץ סימולציה בזמן אמת. חייבים לחשב מראש ולשמור positions לפי frame:
+```tsx
+import Matter from "matter-js";
+// pre-bake בתוך useMemo (לא בתוך render):
+const positions = useMemo(() => {
+  const engine = Matter.Engine.create({ gravity: { y: 1 } });
+  const frames: {x: number, y: number}[] = [];
+  for (let i = 0; i < totalFrames; i++) {
+    Matter.Engine.update(engine, 1000 / fps);
+    frames.push({ x: body.position.x, y: body.position.y });
+  }
+  return frames;
+}, []);
+// בrender: positions[frame]
 ```
 
 ---
