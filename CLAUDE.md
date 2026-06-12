@@ -277,6 +277,78 @@ fontSize: 70, letterSpacing: "-0.02em", color: BRAND.pink
 <FadeTransition fadeOutFrame={870} durationFrames={20} />  // פייד-אאוט בסוף
 ```
 
+### StripTransition ⭐ — רצועות וונציאניות (Venetian blinds)
+**overlay component** — מוגדר דרך `edit-config.ts`, מורנדר אוטומטית ב-`ChofshiVideo.tsx`.  
+N רצועות מכסות/מגלות את המסך בstagger — בדיוק כמו Premiere.
+
+**מתי:** לחיתוך דרמטי בין סצנות, כניסת/יציאת קטע ב-burst.
+
+```ts
+// ב-edit-config.ts:
+export const STRIP_TRANSITIONS: StripEvent[] = [
+  { triggerFrame: 150, durationFrames: 22, strips: 8, direction: "right", mode: "in",  feel: "snappy" },
+  { triggerFrame: 172, durationFrames: 22, strips: 8, direction: "left",  mode: "out", feel: "snappy" },
+];
+// mode: "in" = רצועות מכסות | "out" = רצועות מתגלות
+// direction: כיוון שממנו באות הרצועות ("left" | "right" | "up" | "down")
+// feel: "snappy" | "smooth" | "bouncy"
+```
+
+### IrisTransition ⭐ — עיגול נפתח/נסגר (Circle Wipe)
+**overlay component** — מוגדר דרך `edit-config.ts`, מורנדר אוטומטית ב-`ChofshiVideo.tsx`.  
+SVG mask — עיגול שגדל (open) או קטן (close). אפשר לכוון את מרכז העיגול.
+
+**מתי:** פתיחת סרטון קינמטית (`mode: "open"` מהתחלה), סיום הדרגתי (`mode: "close"`).
+
+```ts
+// ב-edit-config.ts:
+export const IRIS_TRANSITIONS: IrisEvent[] = [
+  { triggerFrame: 0,   durationFrames: 30, mode: "open",  color: "#000000", feel: "smooth" },
+  { triggerFrame: 840, durationFrames: 30, mode: "close", color: "#000000", feel: "snappy" },
+  // cx/cy — מרכז בפיקסלים (ברירת מחדל: מרכז המסך)
+  { triggerFrame: 200, durationFrames: 24, mode: "open", cx: 540, cy: 400, color: "#0e1628" },
+];
+```
+
+### ZoomTransition — זום-אאוט/זום-אין בין סצנות
+**wrapper component** — משמש **ישירות ב-Composition.tsx**, לא דרך edit-config.  
+עוטף outgoing + incoming, מבצע zoom-out+fade → zoom-in+fade.
+
+```tsx
+// שימוש ישיר ב-Composition.tsx:
+import { ZoomTransition } from "./components/ZoomTransition";
+
+<ZoomTransition
+  triggerFrame={150}       // פריים החיתוך
+  durationFrames={20}      // סה"כ (10 לפני + 10 אחרי triggerFrame)
+  scaleAmount={1.5}        // עד כמה זה מתקרב
+  feel="snappy"
+  flashColor="#ffffff"     // null לביטול ה-flash
+  flashOpacity={0.35}
+  outgoing={<SceneA />}
+  incoming={<SceneB />}
+/>
+```
+
+### SlidePush — דחיפה אופקית/אנכית בין סצנות
+**wrapper component** — משמש **ישירות ב-Composition.tsx**, לא דרך edit-config.  
+סצנה ישנה יוצאת, סצנה חדשה נכנסת — שתיהן זזות יחד (push).
+
+```tsx
+// שימוש ישיר ב-Composition.tsx:
+import { SlidePush } from "./components/SlidePush";
+
+<SlidePush
+  triggerFrame={150}    // פריים שבו מתחיל הslide
+  durationFrames={18}
+  direction="right"     // הכיוון שממנו מגיעה הסצנה החדשה
+  feel="snappy"         // "snappy" | "smooth" | "bouncy"
+  outgoing={<SceneA />}
+  incoming={<SceneB />}
+/>
+// direction: "right" (חדשה מימין) | "left" | "up" | "down"
+```
+
 ### ZoomClip
 זום אל נקודה בסרטון עם spring.
 ```tsx

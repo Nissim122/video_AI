@@ -8,6 +8,9 @@ import {
   staticFile,
 } from "remotion";
 import { PersonBurst } from "./components/PersonBurst";
+import { StripTransition } from "./components/StripTransition";
+import { IrisTransition } from "./components/IrisTransition";
+import { STRIP_TRANSITIONS, IRIS_TRANSITIONS } from "./edit-config";
 
 const BRAND = {
   pink:   "#e0176b",
@@ -143,6 +146,10 @@ export const ChofshiVideo: React.FC = () => {
           { type: "text", text: "ללא קוד",        targetX: 0.5,  targetY: 0.76, color: BRAND.green, holdFrames: 90 },
         ]}
       />
+
+      {/* Strip / Iris transitions — topmost layer, covers everything. Driven by edit-config.ts */}
+      {STRIP_TRANSITIONS.length > 0 && <StripTransition events={STRIP_TRANSITIONS} />}
+      {IRIS_TRANSITIONS.length > 0 && <IrisTransition events={IRIS_TRANSITIONS} />}
     </AbsoluteFill>
   );
 };

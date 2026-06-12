@@ -63,18 +63,20 @@ const StripSet: React.FC<StripEvent & { frame: number; width: number; height: nu
         // t=1 → in place (covers), t=0 → off-screen
         const t = mode === "in" ? 1 - progress : progress;
 
-        let transform = "";
-        switch (direction) {
-          case "right": transform = `translateX(${width * t}px)`;  break;
-          case "left":  transform = `translateX(${-width * t}px)`; break;
-          case "down":  transform = `translateY(${height * t}px)`; break;
-          case "up":    transform = `translateY(${-height * t}px)`; break;
-        }
-
+        // Must be computed before transform switch (used to guarantee full off-screen offset)
         const stripW = isHorizontal ? Math.ceil(width / strips) + 1 : width;
         const stripH = isHorizontal ? height : Math.ceil(height / strips) + 1;
         const left   = isHorizontal ? i * Math.floor(width / strips) : 0;
         const top    = isHorizontal ? 0 : i * Math.floor(height / strips);
+
+        // For "left" and "up", the last strip needs stripW/stripH extra offset to clear the screen
+        let transform = "";
+        switch (direction) {
+          case "right": transform = `translateX(${width * t}px)`;            break;
+          case "left":  transform = `translateX(${-(width + stripW) * t}px)`; break;
+          case "down":  transform = `translateY(${height * t}px)`;            break;
+          case "up":    transform = `translateY(${-(height + stripH) * t}px)`; break;
+        }
 
         return (
           <div

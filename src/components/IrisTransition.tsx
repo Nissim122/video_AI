@@ -70,12 +70,14 @@ const IrisSet: React.FC<IrisEvent & { frame: number; width: number; height: numb
       ? maxRadius * progress
       : maxRadius * (1 - progress);
 
-  // Skip rendering when fully transparent
-  if (mode === "open" && radius >= maxRadius) return null;
-  if (mode === "close" && radius <= 0) return null;
-
-  // Stable ID per component instance — use a ref so it doesn't change per render
+  // Stable ID per component instance — must be before any early returns (Rules of Hooks)
   const id = React.useRef(nextId()).current;
+
+  // "open" fully revealed — no overlay needed
+  if (mode === "open" && radius >= maxRadius) return null;
+  // "close" fully covered — render solid rect (SVG with r=0 achieves the same but this is cheaper)
+  if (mode === "close" && radius <= 0)
+    return <div style={{ position: "absolute", inset: 0, background: color }} />;
 
   return (
     <svg
