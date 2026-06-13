@@ -1,7 +1,7 @@
 import React from "react";
 import { useCurrentFrame, useVideoConfig, spring, interpolate, Img, staticFile } from "remotion";
-import { PhoneEntrance } from "../components/PhoneEntrance";
-import { CircleClick } from "../components/CircleClick";
+import { PhoneEntrance } from "../../../components/PhoneEntrance";
+import { CircleClick } from "../../../components/CircleClick";
 
 // ── Timing (frames relative to scene start) ────────────────────────────────
 const PAUSE_1_END = 38;
@@ -79,7 +79,7 @@ export const Screen2: React.FC<Screen2Props> = ({ startAt = 0, logicalFrame }) =
             }}
           >
             <Img
-              src={staticFile("screenshot-3-screen2-mobile.png")}
+              src={staticFile("scanner/screenshot-3-screen2-mobile.png")}
               style={{ width: "100%", height: "auto", display: "block" }}
             />
             {CLICKS.map((c, i) => (

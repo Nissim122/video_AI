@@ -1,6 +1,6 @@
 import React from "react";
 import { useCurrentFrame, interpolate, Img, staticFile } from "remotion";
-import { PhoneEntrance } from "../components/PhoneEntrance";
+import { PhoneEntrance } from "../../../components/PhoneEntrance";
 
 const FRAMES_COUNT = 8;
 const FRAMES_PER_IMAGE = 10; // 8×10 = 80 → exact cycle, ~33% slower
@@ -42,7 +42,7 @@ export const ScannerTransition: React.FC = () => {
               <Img
                 key={i}
                 src={staticFile(
-                  `scanner-frames/anim-frame-${String(i + 1).padStart(2, "0")}.png`
+                  `scanner/frames/anim-frame-${String(i + 1).padStart(2, "0")}.png`
                 )}
                 style={{
                   position: "absolute",

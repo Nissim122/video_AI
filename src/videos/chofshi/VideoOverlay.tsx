@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import {
   AbsoluteFill,
   useCurrentFrame,
@@ -6,56 +6,56 @@ import {
   spring,
   interpolate,
 } from "remotion";
-import { VideoBase } from "../components/VideoBase";
-import { LogoWatermark } from "../components/LogoWatermark";
-import { ChapterMarker } from "../components/ChapterMarker";
-import { PictureInPicture } from "../components/PictureInPicture";
-import { LowerThird } from "../components/LowerThird";
-import { TextPop } from "../components/TextPop";
-import { Callout } from "../components/Callout";
-import { OutroScreen } from "../components/OutroScreen";
-import { VignetteGrade } from "../components/VignetteGrade";
-import { FadeTransition } from "../components/FadeTransition";
-import { KineticText } from "../components/KineticText";
-import { BRollOverlay } from "../components/BRollOverlay";
-import { ReactionBubble } from "../components/ReactionBubble";
-import { PunchTransition } from "../components/PunchTransition";
-import { BulletList } from "../components/BulletList";
-import { StatCard } from "../components/StatCard";
-import { HighlightBox } from "../components/HighlightBox";
-import { CTAButton } from "../components/CTAButton";
-import { SocialHandle } from "../components/SocialHandle";
+import { VideoBase } from "../../components/VideoBase";
+import { LogoWatermark } from "../../components/LogoWatermark";
+import { ChapterMarker } from "../../components/ChapterMarker";
+import { PictureInPicture } from "../../components/PictureInPicture";
+import { LowerThird } from "../../components/LowerThird";
+import { TextPop } from "../../components/TextPop";
+import { Callout } from "../../components/Callout";
+import { OutroScreen } from "../../components/OutroScreen";
+import { VignetteGrade } from "../../components/VignetteGrade";
+import { FadeTransition } from "../../components/FadeTransition";
+import { KineticText } from "../../components/KineticText";
+import { BRollOverlay } from "../../components/BRollOverlay";
+import { ReactionBubble } from "../../components/ReactionBubble";
+import { PunchTransition } from "../../components/PunchTransition";
+import { BulletList } from "../../components/BulletList";
+import { StatCard } from "../../components/StatCard";
+import { HighlightBox } from "../../components/HighlightBox";
+import { CTAButton } from "../../components/CTAButton";
+import { SocialHandle } from "../../components/SocialHandle";
 // ── New components ────────────────────────────────────────────────────────────
-import { TypewriterText } from "../components/TypewriterText";
-import { MorphText } from "../components/MorphText";
-import { TextScramble } from "../components/TextScramble";
-import { GradientText } from "../components/GradientText";
-import { WordHighlight } from "../components/WordHighlight";
-import { ChatBubble } from "../components/ChatBubble";
-import { PhoneNotification } from "../components/PhoneNotification";
-import { ConfirmCheck } from "../components/ConfirmCheck";
-import { ProgressRing } from "../components/ProgressRing";
-import { AutomationFlow } from "../components/AutomationFlow";
-import { CameraShake } from "../components/CameraShake";
-import { SpotlightReveal } from "../components/SpotlightReveal";
-import { ZoomBurst } from "../components/ZoomBurst";
-import { ParticleField } from "../components/ParticleField";
-import { GlowPulse } from "../components/GlowPulse";
-import { DrawPath } from "../components/DrawPath";
-import { CountdownTimer } from "../components/CountdownTimer";
-import { FloatingEmoji } from "../components/FloatingEmoji";
-import { TrackedOverlay } from "../components/TrackedOverlay";
-import { SmartZoom } from "../components/SmartZoom";
-import { WhipPan } from "../components/WhipPan";
-import { ContinuousDrift } from "../components/ContinuousDrift";
-import { MotionBlur } from "../components/MotionBlur";
-import { DepthOfField } from "../components/DepthOfField";
-import { LensFlare } from "../components/LensFlare";
-import { ChromaticAberration } from "../components/ChromaticAberration";
-import { TextLineReveal } from "../components/TextLineReveal";
-import { AnamorphicStreak } from "../components/AnamorphicStreak";
-import { PersonBurst } from "../components/PersonBurst";
-import { AEText } from "../components/AEText";
+import { TypewriterText } from "../../components/TypewriterText";
+import { MorphText } from "../../components/MorphText";
+import { TextScramble } from "../../components/TextScramble";
+import { GradientText } from "../../components/GradientText";
+import { WordHighlight } from "../../components/WordHighlight";
+import { ChatBubble } from "../../components/ChatBubble";
+import { PhoneNotification } from "../../components/PhoneNotification";
+import { ConfirmCheck } from "../../components/ConfirmCheck";
+import { ProgressRing } from "../../components/ProgressRing";
+import { AutomationFlow } from "../../components/AutomationFlow";
+import { CameraShake } from "../../components/CameraShake";
+import { SpotlightReveal } from "../../components/SpotlightReveal";
+import { ZoomBurst } from "../../components/ZoomBurst";
+import { ParticleField } from "../../components/ParticleField";
+import { GlowPulse } from "../../components/GlowPulse";
+import { DrawPath } from "../../components/DrawPath";
+import { CountdownTimer } from "../../components/CountdownTimer";
+import { FloatingEmoji } from "../../components/FloatingEmoji";
+import { TrackedOverlay } from "../../components/TrackedOverlay";
+import { SmartZoom } from "../../components/SmartZoom";
+import { WhipPan } from "../../components/WhipPan";
+import { ContinuousDrift } from "../../components/ContinuousDrift";
+import { MotionBlur } from "../../components/MotionBlur";
+import { DepthOfField } from "../../components/DepthOfField";
+import { LensFlare } from "../../components/LensFlare";
+import { ChromaticAberration } from "../../components/ChromaticAberration";
+import { TextLineReveal } from "../../components/TextLineReveal";
+import { AnamorphicStreak } from "../../components/AnamorphicStreak";
+import { PersonBurst } from "../../components/PersonBurst";
+import { AEText } from "../../components/AEText";
 import {
   VIDEO_CONFIG, PIPS, CHAPTERS, LOGO,
   LOWER_THIRDS, TEXT_POPS, CALLOUTS, OUTRO, GRADE,
@@ -72,7 +72,7 @@ import {
   TEXT_LINE_REVEALS, ANAMORPHIC_STREAKS,
   PERSON_BURSTS,
   AE_TEXTS,
-} from "../edit-config";
+} from "./edit-config";
 
 const ICON_SIZE = 120;
 const LAUNCH_FRAME = 75;

@@ -1,6 +1,6 @@
 import React from "react";
 import { useCurrentFrame, useVideoConfig, spring, interpolate } from "remotion";
-import { BRAND } from "../brand";
+import { BRAND } from "../../../brand";
 
 export const SCREEN5_DURATION = 100;
 

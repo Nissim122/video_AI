@@ -7,9 +7,9 @@ import {
   OffthreadVideo,
   staticFile,
 } from "remotion";
-import { PersonBurst } from "./components/PersonBurst";
-import { StripTransition } from "./components/StripTransition";
-import { IrisTransition } from "./components/IrisTransition";
+import { PersonBurst } from "../../components/PersonBurst";
+import { StripTransition } from "../../components/StripTransition";
+import { IrisTransition } from "../../components/IrisTransition";
 import { STRIP_TRANSITIONS, IRIS_TRANSITIONS } from "./edit-config";
 
 const BRAND = {
@@ -117,7 +117,7 @@ export const ChofshiVideo: React.FC = () => {
     <AbsoluteFill style={{ background: "#000000" }}>
       {/* Background video — full screen (fallback while masked video processes) */}
       <OffthreadVideo
-        src={staticFile("chofshi.mp4")}
+        src={staticFile("chofshi/chofshi.mp4")}
         style={{ width: "100%", height: "100%", objectFit: "cover" }}
       />
 
@@ -126,7 +126,7 @@ export const ChofshiVideo: React.FC = () => {
 
       {/* Masked person video (transparent background) — on top of gray box */}
       <OffthreadVideo
-        src={staticFile("chofshi_masked.webm")}
+        src={staticFile("chofshi/chofshi_masked.webm")}
         transparent={true}
         style={{ width: "100%", height: "100%", objectFit: "cover" }}
       />

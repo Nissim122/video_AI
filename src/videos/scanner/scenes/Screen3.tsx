@@ -8,9 +8,9 @@ import {
   staticFile,
   Easing,
 } from "remotion";
-import { PhoneEntrance } from "../components/PhoneEntrance";
-import { ScrollGesture } from "../components/ScrollGesture";
-import { CircleClick } from "../components/CircleClick";
+import { PhoneEntrance } from "../../../components/PhoneEntrance";
+import { ScrollGesture } from "../../../components/ScrollGesture";
+import { CircleClick } from "../../../components/CircleClick";
 
 // Image: 1170×7878 → rendered at 548px wide → height ≈ 3690px
 // IPhone14 crops 70px from top (status bar). Visible window: 1220px.
@@ -95,7 +95,7 @@ export const Screen3: React.FC<Screen3Props> = ({ startAt = 0, logicalFrame }) =
             }}
           >
             <Img
-              src={staticFile("screenshot-2-screen4-mobile.png")}
+              src={staticFile("scanner/screenshot-2-screen4-mobile.png")}
               style={{ width: "100%", height: "auto", display: "block" }}
             />
             {CLICKS.map((c, i) => (

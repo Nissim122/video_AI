@@ -1,13 +1,14 @@
 import "./index.css";
 import React from "react";
 import { Composition, AbsoluteFill, staticFile, Img } from "remotion";
-import { MyComposition, CompositionSchema, SPEED_SAVINGS } from "./Composition";
-import { T } from "./scenes/timeline";
+import { MyComposition, CompositionSchema, SPEED_SAVINGS } from "./videos/scanner/Composition";
+import { T } from "./videos/scanner/scenes/timeline";
 import { PhoneEntrance, PhoneVariant } from "./components/PhoneEntrance";
 import { loadFont } from "@remotion/google-fonts/Heebo";
 import { BRAND } from "./brand";
-import { VideoOverlay } from "./scenes/VideoOverlay";
-import { ChofshiVideo } from "./ChofshiVideo";
+import { VideoOverlay } from "./videos/chofshi/VideoOverlay";
+import { ChofshiVideo } from "./videos/chofshi/ChofshiVideo";
+// ── סרטונים לעריכה — מוסיפים כאן import בכל פרויקט חדש ──────────────────────
 
 const { fontFamily } = loadFont();
 
@@ -46,7 +47,7 @@ const PhoneShowcase: React.FC = () => (
       >
         <PhoneEntrance variant={variant} delay={i * 8}>
           <Img
-            src={staticFile("screen-1-pain.jpeg")}
+            src={staticFile("scanner/screen-1-pain.jpeg")}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         </PhoneEntrance>
@@ -69,6 +70,9 @@ const PhoneShowcase: React.FC = () => (
 export const RemotionRoot: React.FC = () => {
   return (
     <>
+      {/* ── סרטונים לעריכה — מוסיפים כאן Composition בכל פרויקט חדש ────────── */}
+
+      {/* ── פרויקטים קיימים ────────────────────────────────────────────────── */}
       <Composition
         id="ChofshiVideo"
         component={ChofshiVideo}
@@ -105,7 +109,7 @@ export const RemotionRoot: React.FC = () => {
           hookText: "בניתי סוכן שמוצא אוטומציות לעסק שלך בפחות מדקה",
           subText: "לידים, פולואפים, הצעות מחיר, תזכורות...",
           ctaText: "",
-          screenImage: "screen-1-pain.jpeg",
+          screenImage: "scanner/screen-1-pain.jpeg",
         }}
       />
     </>

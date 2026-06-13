@@ -6,8 +6,8 @@ import {
   interpolate,
   Easing,
 } from "remotion";
-import { IPhone14 } from "../components/IPhone14";
-import { ScrollGesture } from "../components/ScrollGesture";
+import { IPhone14 } from "../../../components/IPhone14";
+import { ScrollGesture } from "../../../components/ScrollGesture";
 import { EMAIL_HTML } from "./emailHtml";
 
 export const SCREEN4_DURATION = 100;

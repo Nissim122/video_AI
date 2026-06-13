@@ -18,20 +18,36 @@ export const FadeTransition: React.FC<FadeTransitionProps> = ({
 }) => {
   const frame = useCurrentFrame();
 
-  const fadeOut = interpolate(frame, [fadeOutFrame, fadeOutFrame + durationFrames], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
+  let opacity = 0;
 
-  const fadeIn =
-    fadeInFrame != null
-      ? interpolate(frame, [fadeInFrame, fadeInFrame + durationFrames], [1, 0], {
-          extrapolateLeft: "clamp",
-          extrapolateRight: "clamp",
-        })
-      : 0;
-
-  const opacity = Math.max(fadeOut, fadeIn);
+  if (fadeInFrame != null) {
+    // Fade-in-out bridge: black → visible → black (or black → visible only)
+    if (frame >= fadeInFrame + durationFrames) {
+      // After fade-in completes: transparent
+      opacity = 0;
+    } else if (frame >= fadeInFrame) {
+      // Fading back from black to visible
+      opacity = interpolate(frame, [fadeInFrame, fadeInFrame + durationFrames], [1, 0], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      });
+    } else if (frame >= fadeOutFrame + durationFrames) {
+      // Bridging: fully black between fade-out end and fade-in start
+      opacity = 1;
+    } else {
+      // Fading to black
+      opacity = interpolate(frame, [fadeOutFrame, fadeOutFrame + durationFrames], [0, 1], {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+      });
+    }
+  } else {
+    // Fade-out only: stays black forever after completion
+    opacity = interpolate(frame, [fadeOutFrame, fadeOutFrame + durationFrames], [0, 1], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+  }
 
   if (opacity === 0) return null;
 

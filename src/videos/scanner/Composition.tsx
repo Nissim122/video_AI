@@ -10,17 +10,17 @@ import {
 } from "remotion";
 import { loadFont } from "@remotion/google-fonts/Heebo";
 import { z } from "zod";
-import { BRAND } from "./brand";
+import { BRAND } from "../../brand";
 import { Sequence } from "remotion";
-import { PhoneEntrance } from "./components/PhoneEntrance";
-import { CircleClick } from "./components/CircleClick";
+import { PhoneEntrance } from "../../components/PhoneEntrance";
+import { CircleClick } from "../../components/CircleClick";
 import { T } from "./scenes/timeline";
 import { Screen2 } from "./scenes/Screen2";
 import { ScannerTransition } from "./scenes/ScannerTransition";
 import { Screen3 } from "./scenes/Screen3";
 import { Screen4 } from "./scenes/Screen4";
 import { Screen5 } from "./scenes/Screen5";
-import { HookAnimation } from "./components/HookAnimation";
+import { HookAnimation } from "../../components/HookAnimation";
 
 const { fontFamily } = loadFont();
 

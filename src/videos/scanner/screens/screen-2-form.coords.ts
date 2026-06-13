@@ -1,4 +1,4 @@
-import { ScreenRegion } from "../types";
+import { ScreenRegion } from "../../../types";
 export type { ScreenRegion };
 
 // ── מסך 2 — בחירת כלים ──────────────────────────────────────────────────────

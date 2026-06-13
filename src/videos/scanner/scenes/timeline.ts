@@ -1,4 +1,4 @@
-import { buildTimeline } from "../timeline";
+import { buildTimeline } from "../../../timeline";
 import { SCREEN2_DURATION } from "./Screen2";
 import { SCANNER_DURATION } from "./ScannerTransition";
 import { SCREEN3_DURATION } from "./Screen3";

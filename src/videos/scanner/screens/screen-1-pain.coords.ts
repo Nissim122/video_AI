@@ -1,4 +1,4 @@
-import { ScreenRegion } from "../types";
+import { ScreenRegion } from "../../../types";
 export type { ScreenRegion };
 
 export const SCREEN_1_PAIN: Record<string, ScreenRegion> = {

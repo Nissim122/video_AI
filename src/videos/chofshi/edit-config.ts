@@ -1,29 +1,29 @@
-// ─────────────────────────────────────────────────────────────────────────────
+﻿// ─────────────────────────────────────────────────────────────────────────────
 // Edit Config — כל הגדרות העריכה במקום אחד
 // ─────────────────────────────────────────────────────────────────────────────
 
-import type { NotificationApp } from "./components/PhoneNotification";
-import type { FlowNode, FlowEdge } from "./components/AutomationFlow";
-import type { ShakeEvent } from "./components/CameraShake";
-import type { ZoomBurstEvent } from "./components/ZoomBurst";
-import type { ChatMessage } from "./components/ChatBubble";
-import type { EmojiFloat } from "./components/FloatingEmoji";
-import type { TrackingData } from "./components/TrackedOverlay";
-import type { BurstElement } from "./components/PersonBurst";
-import type { SmartZoomEvent } from "./components/SmartZoom";
-import type { WhipPanEvent } from "./components/WhipPan";
-import type { StripEvent } from "./components/StripTransition";
-import type { IrisEvent } from "./components/IrisTransition";
-import type { MotionBlurEvent } from "./components/MotionBlur";
-import type { DOFEvent } from "./components/DepthOfField";
-import type { LensFlareEvent } from "./components/LensFlare";
-import type { CAEvent } from "./components/ChromaticAberration";
-import type { TextLineRevealItem } from "./components/TextLineReveal";
-import type { AnamorphicStreakEvent } from "./components/AnamorphicStreak";
-import type { AETextProps } from "./components/AEText";
+import type { NotificationApp } from "../../components/PhoneNotification";
+import type { FlowNode, FlowEdge } from "../../components/AutomationFlow";
+import type { ShakeEvent } from "../../components/CameraShake";
+import type { ZoomBurstEvent } from "../../components/ZoomBurst";
+import type { ChatMessage } from "../../components/ChatBubble";
+import type { EmojiFloat } from "../../components/FloatingEmoji";
+import type { TrackingData } from "../../components/TrackedOverlay";
+import type { BurstElement } from "../../components/PersonBurst";
+import type { SmartZoomEvent } from "../../components/SmartZoom";
+import type { WhipPanEvent } from "../../components/WhipPan";
+import type { StripEvent } from "../../components/StripTransition";
+import type { IrisEvent } from "../../components/IrisTransition";
+import type { MotionBlurEvent } from "../../components/MotionBlur";
+import type { DOFEvent } from "../../components/DepthOfField";
+import type { LensFlareEvent } from "../../components/LensFlare";
+import type { CAEvent } from "../../components/ChromaticAberration";
+import type { TextLineRevealItem } from "../../components/TextLineReveal";
+import type { AnamorphicStreakEvent } from "../../components/AnamorphicStreak";
+import type { AETextProps } from "../../components/AEText";
 
 export const VIDEO_CONFIG = {
-  src: "chofshi.mp4",    // שם הקובץ ב-public/
+  src: "chofshi/chofshi.mp4",    // שם הקובץ ב-public/
   fps: 30,
   durationInFrames: 900,    // עדכן לאורך האמיתי של הסרטון × fps
   width: 1080,
@@ -493,7 +493,7 @@ export const DRAW_PATHS: Array<{
 // ── 17. SplitScreen ───────────────────────────────────────────────────────────
 // שני פאנלים זה לצד זה — לשימוש ב-Composition.tsx ישירות (ראה תיעוד):
 //
-// import { SplitScreen } from "./components/SplitScreen";
+// import { SplitScreen } from "../../components/SplitScreen";
 // <SplitScreen
 //   enterFrame={0}
 //   left={{ content: <AbsoluteFill style={{background:"red"}}/>, label: "לפני" }}
@@ -504,7 +504,7 @@ export const DRAW_PATHS: Array<{
 // ── 18. MaskReveal ────────────────────────────────────────────────────────────
 // wipe reveal שחושף תוכן — לשימוש ב-Composition.tsx ישירות:
 //
-// import { MaskReveal } from "./components/MaskReveal";
+// import { MaskReveal } from "../../components/MaskReveal";
 // <MaskReveal enterFrame={0} direction="left">
 //   <Screen2 ... />
 // </MaskReveal>
@@ -572,7 +572,7 @@ export const FLOATING_EMOJIS: EmojiFloat[] = [
 // זום אוטומטי אל אזור ספציפי — אידיאלי כשמציגים MockBrowser בפורמט 9:16
 // עוטף את הרכיב ב-Composition.tsx ישירות (לא דרך VideoOverlay):
 //
-// import { FocusZoom } from "./components/FocusZoom";
+// import { FocusZoom } from "../../components/FocusZoom";
 //
 // // זום פנימה אל אזור הטופס בתוך הדפדפן (MockBrowser מרוכז בחצי העליון)
 // <FocusZoom
@@ -594,7 +594,7 @@ export const FLOATING_EMOJIS: EmojiFloat[] = [
 // מונע חפיפה בין רכיבים שנמצאים באותה אזור (למשל LowerThird + CTAButton)
 // שימוש ב-Composition.tsx ישירות:
 //
-// import { SmartStack } from "./components/SmartStack";
+// import { SmartStack } from "../../components/SmartStack";
 //
 // const VIDEO_H = 1920;
 // const LOWER_H = 120;  // גובה משוער של LowerThird
@@ -713,7 +713,7 @@ export const ANAMORPHIC_STREAKS: AnamorphicStreakEvent[] = [
 
 // ── ParallaxLayer — ב-Composition.tsx ישירות (עוטף תוכן) ────────────────────
 //
-// import { ParallaxLayer } from "./components/ParallaxLayer";
+// import { ParallaxLayer } from "../../components/ParallaxLayer";
 //
 // // רקע נע לאט (depth גבוה = תנועה מהירה יותר)
 // <ParallaxLayer depth={0.9} panAmountX={50} panAmountY={25}>
@@ -727,7 +727,7 @@ export const ANAMORPHIC_STREAKS: AnamorphicStreakEvent[] = [
 
 // ── Bloom — glow diffuse רך (ב-Composition.tsx ישירות) ───────────────────────
 //
-// import { Bloom } from "./components/Bloom";
+// import { Bloom } from "../../components/Bloom";
 //
 // // גלוב סביב טקסט
 // <Bloom intensity={0.6} radius={24} color={BRAND.blueL} enterFrame={60}>
@@ -883,7 +883,7 @@ export const IRIS_TRANSITIONS: IrisEvent[] = [
 // ── ZoomTransition — זום-אאוט מסצנה אחת לשנייה ────────────────────────────────
 // שימוש ישיר ב-Composition.tsx בלבד (עוטף שני children):
 //
-// import { ZoomTransition } from "./components/ZoomTransition";
+// import { ZoomTransition } from "../../components/ZoomTransition";
 //
 // <ZoomTransition
 //   triggerFrame={300}          // frame החיתוך (10 לפני = zoom-out, 10 אחרי = zoom-in)
@@ -898,7 +898,7 @@ export const IRIS_TRANSITIONS: IrisEvent[] = [
 // ── SlidePush — דחיפה אופקית/אנכית ───────────────────────────────────────────
 // שימוש ישיר ב-Composition.tsx בלבד (עוטף שני children):
 //
-// import { SlidePush } from "./components/SlidePush";
+// import { SlidePush } from "../../components/SlidePush";
 //
 // <SlidePush
 //   triggerFrame={300}          // frame תחילת הדחיפה

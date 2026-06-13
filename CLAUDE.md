@@ -37,7 +37,7 @@ rgba = cv2.merge([r, g, b, a])
 
 ## אימות ויזואלי — חובה לפני סיום כל משימה
 
-לאחר כל עריכה לקובץ קומפוזיציה (`src/*.tsx`, `src/edit-config.ts`, `src/scenes/*.tsx`):
+לאחר כל עריכה לקובץ קומפוזיציה (`src/videos/[name]/*.tsx`, `src/videos/[name]/edit-config.ts`, `src/videos/[name]/scenes/*.tsx`):
 
 1. הרץ `node screenshot.mjs [CompId] [frame]` — ברירת מחדל: `VideoOverlay 60`
 2. קרא את ה-PNG שנוצר ב-`preview/` עם כלי ה-Read
@@ -60,8 +60,9 @@ rgba = cv2.merge([r, g, b, a])
 ### שלב 2 — בנייה (אוטומטי אחרי אישור)
 לאחר שהמשתמש מאשר את מסמך התכנון — הפעל את לוגיקת `/video-build`:
 - עבוד עם סקיל `remotion` לפי best practices
-- כתוב את הקוד ב-`src/Composition.tsx` ו-`src/Root.tsx`
-- אל תמציא מבנה תיקיות חדש
+- צור תיקייה `src/videos/[name]/` עם `edit-config.ts` + הרכב שמשתמש ב-`VideoEditor`
+- רשום את הקומפוזיציה ב-`src/Root.tsx`
+- אל תמציא מבנה תיקיות מחוץ ל-`src/videos/`
 
 ---
 
@@ -69,10 +70,21 @@ rgba = cv2.merge([r, g, b, a])
 
 ```
 src/
-  Composition.tsx   ← הקומפוזיציה הראשית
-  Root.tsx          ← רישום הקומפוזיציה
-  scenes/           ← נוצר רק לסרטונים מרובי-סצנות
+  Root.tsx                        ← רישום כל הקומפוזיציות
+  VideoEditor.tsx                 ← מנוע עריכה גנרי (לא נוגעים בו ישירות)
+  videos/
+    VideoEditorTypes.ts           ← טיפוסים + DEFAULT_CONFIG משותפים
+    [name]/                       ← תיקייה לכל סרטון
+      edit-config.ts              ← כל הגדרות העריכה
+      [Name]Video.tsx             ← קומפוזיציה שמשתמשת ב-VideoEditor
+      scenes/                     ← רק לסרטונים מרובי-סצנות
+  components/                     ← ספריית רכיבים משותפת (לא נוגעים)
 ```
+
+**כשיוצרים סרטון חדש:**
+1. `src/videos/[name]/edit-config.ts` — הגדרות (spread על DEFAULT_CONFIG)
+2. `src/videos/[name]/[Name]Video.tsx` — `<VideoEditor {...config} />`
+3. `src/Root.tsx` — הוסף `<Composition id="..." component={...} />`
 
 ## עיצוב — Clix Brand (תמיד)
 
@@ -135,7 +147,7 @@ fontSize: 70, letterSpacing: "-0.02em", color: BRAND.pink
 
 ## ספריית רכיבים קיימים — `src/components/`
 
-> כל הרכיבים מיובאים ב-`VideoOverlay.tsx` ומוגדרים דרך `edit-config.ts`.  
+> כל הרכיבים מיובאים ב-`VideoEditor.tsx` ומוגדרים דרך `src/videos/[name]/edit-config.ts`.  
 > לא בונים רכיב חדש לפני שבודקים שאין כאן רכיב מתאים.
 
 ### VideoBase
@@ -278,7 +290,7 @@ fontSize: 70, letterSpacing: "-0.02em", color: BRAND.pink
 ```
 
 ### StripTransition ⭐ — רצועות וונציאניות (Venetian blinds)
-**overlay component** — מוגדר דרך `edit-config.ts`, מורנדר אוטומטית ב-`ChofshiVideo.tsx`.  
+**overlay component** — מוגדר דרך `edit-config.ts`, מורנדר אוטומטית ב-`VideoEditor.tsx`.  
 N רצועות מכסות/מגלות את המסך בstagger — בדיוק כמו Premiere.
 
 **מתי:** לחיתוך דרמטי בין סצנות, כניסת/יציאת קטע ב-burst.
@@ -295,7 +307,7 @@ export const STRIP_TRANSITIONS: StripEvent[] = [
 ```
 
 ### IrisTransition ⭐ — עיגול נפתח/נסגר (Circle Wipe)
-**overlay component** — מוגדר דרך `edit-config.ts`, מורנדר אוטומטית ב-`ChofshiVideo.tsx`.  
+**overlay component** — מוגדר דרך `edit-config.ts`, מורנדר אוטומטית ב-`VideoEditor.tsx`.  
 SVG mask — עיגול שגדל (open) או קטן (close). אפשר לכוון את מרכז העיגול.
 
 **מתי:** פתיחת סרטון קינמטית (`mode: "open"` מהתחלה), סיום הדרגתי (`mode: "close"`).
@@ -675,7 +687,7 @@ Badge עגלגל עם counter מונפש — "חוסך 10 שעות / ₪5,000 ב
 
 ## קטגוריה ו — מנוע מצלמה מתקדם (Camera Engine)
 
-> כל 3 הרכיבים פועלים דרך `edit-config.ts` ונטענים אוטומטית ב-`VideoOverlay.tsx`.  
+> כל 3 הרכיבים פועלים דרך `edit-config.ts` ונטענים אוטומטית ב-`VideoEditor.tsx`.  
 > סדר שכבות ה-wrapper: `ZoomBurst → SmartZoom → ContinuousDrift → WhipPan → CameraShake → תוכן`
 
 ### SmartZoom
@@ -732,18 +744,24 @@ export const DRIFT = {
 
 ## edit-config.ts — איך מפעילים רכיבים
 
-כל הרכיבים מוגדרים ב-`src/edit-config.ts` כמערכים ואובייקטים.  
-`VideoOverlay.tsx` קורא ומרנדר הכל אוטומטית — **לא נוגעים ב-VideoOverlay ישירות**.
+כל הרכיבים מוגדרים ב-`src/videos/[name]/edit-config.ts`.  
+`VideoEditor.tsx` קורא ומרנדר הכל אוטומטית — **לא נוגעים ב-VideoEditor ישירות**.
 
 ```ts
-// דוגמה מינימלית לסרטון עם טקסט + CTA
-export const TEXT_POPS = [
-  { text: "חוסך 10 שעות", enterFrame: 60, holdFrames: 50, style: "pink" as const },
-];
-export const CTA_BUTTONS = [
-  { text: "לפרטים נוספים", enterFrame: 600, holdFrames: 180 },
-];
-export const OUTRO = { show: true, enterFrame: 820, ctaText: "...", subText: "...", linkText: "clixautomations.com" };
+import { DEFAULT_CONFIG } from "../VideoEditorTypes";
+
+export const VIDEO_CONFIG = {
+  ...DEFAULT_CONFIG,
+  src: "myname/clip.mp4",
+  durationInFrames: 900,
+  textPops: [
+    { text: "חוסך 10 שעות", enterFrame: 60, holdFrames: 50, style: "pink" as const },
+  ],
+  ctaButtons: [
+    { text: "לפרטים נוספים", enterFrame: 600, holdFrames: 180 },
+  ],
+  outro: { show: true, enterFrame: 820, ctaText: "...", subText: "...", linkText: "clixautomations.com" },
+};
 ```
 
 ---
