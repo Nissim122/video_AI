@@ -927,6 +927,178 @@ const positions = useMemo(() => {
 
 ---
 
+### רעש אורגני
+**`@remotion/noise`** — Perlin/simplex noise לתנועה אורגנית. מחזיר ערך בין -1 ל-1.
+```tsx
+import { noise2D, noise3D, noise4D } from "@remotion/noise";
+// תנועת drift אורגנית:
+const driftX = noise2D("cam-x", frame / 120, 0) * 18;
+const driftY = noise2D("cam-y", 0, frame / 120) * 12;
+// טקסט רועד:
+const wobble = noise3D("wobble", frame / 30, index, 0) * 4;
+// noise3D/4D — לאנימציות מורכבות יותר עם פרמטר נוסף (time, index, layer)
+```
+
+---
+
+### GIFs
+**`@remotion/gif`** — רנדור קובץ GIF בתוך קומפוזיציה, מסונכרן עם frame.
+```tsx
+import { Gif } from "@remotion/gif";
+<Gif
+  src={staticFile("animation.gif")}
+  width={400} height={400}
+  fit="contain"  // "fill" | "contain" | "cover" | "none"
+  onError={(e) => console.error(e)}
+/>
+```
+
+---
+
+### פונטים מ-Google
+**`@remotion/google-fonts`** — טעינת Google Font בצורה מסונכרנת עם Remotion (לא `<link>`).
+```tsx
+import { loadFont } from "@remotion/google-fonts/Heebo";
+const { fontFamily } = loadFont();
+// שימוש: style={{ fontFamily }}
+// הפונט זמין מיד ב-render, ללא FOUT
+```
+
+---
+
+### Light Leaks
+**`@remotion/light-leaks`** — overlay של דליפות אור קינמטיות. מניח מעל הוידאו.
+```tsx
+import { LightLeak } from "@remotion/light-leaks";
+<LightLeak
+  seed={1}          // מספר שרירותי — קובע את סוג הדליפה
+  hueShift={0}      // סיבוב גוון (0–360)
+  durationInFrames={30}  // אופציונלי — ברירת מחדל: אורך הסצנה
+/>
+// seed שונה = דליפת אור שונה. כמה seeds לבדוק: 1, 5, 12, 42
+```
+
+---
+
+### מעברים מובנים
+**`@remotion/transitions`** — מעברים מוכנים בין סצנות עם `TransitionSeries`.  
+**Presentations זמינות:** `slide`, `fade`, `wipe`, `flip`, `dissolve`, `zoom-in-out`, `cross-zoom`, `dreamy-zoom`, `film-burn`, `linear-blur`, `clock-wipe`, `iris`, `ripple`, `crosswarp`, `book-flip`, `swap`, `none`.
+```tsx
+import { TransitionSeries, springTiming, linearTiming } from "@remotion/transitions";
+import { slide } from "@remotion/transitions/slide";
+import { fade } from "@remotion/transitions/fade";
+import { filmBurn } from "@remotion/transitions/film-burn";
+
+<TransitionSeries>
+  <TransitionSeries.Sequence durationInFrames={90}>
+    <SceneA />
+  </TransitionSeries.Sequence>
+  <TransitionSeries.Transition
+    timing={springTiming({ durationInFrames: 20, config: { damping: 200 } })}
+    presentation={slide({ direction: "from-left" })}
+  />
+  <TransitionSeries.Sequence durationInFrames={90}>
+    <SceneB />
+  </TransitionSeries.Sequence>
+</TransitionSeries>
+// timing: springTiming | linearTiming
+// slide direction: "from-left" | "from-right" | "from-top" | "from-bottom"
+```
+
+---
+
+### עיבוד מדיה (server-side / pre-processing)
+**`mediabunny`** — ספריית TypeScript לקריאה, כתיבה והמרה של קבצי מדיה בדפדפן (mp4, webm, wav, mp3).  
+**שימוש עיקרי:** ניתוח waveform אודיו לפני render, חילוץ מטה-דאטה, המרת פורמטים.  
+**לא** לשימוש בתוך קומפוזיציית Remotion (side-effect heavy) — אלא בסקריפטים נפרדים.
+```ts
+// דוגמה: חילוץ מידע על קובץ אודיו
+import { createMediaReader } from "mediabunny";
+const reader = await createMediaReader(file);
+const info = await reader.getInfo();
+console.log(info.duration, info.audioTracks);
+```
+
+---
+
+### טקסט 3D מקצועי
+**`troika-three-text`** — SDF-based 3D text ל-Three.js. חד בכל סקייל, תומך outlines, strokes, gradients, פונטים מותאמים.  
+**עדיף על `<Text>` של drei** לכל טקסט ראשי בסצנת 3D.
+```tsx
+import { Text } from "troika-three-text";
+// בתוך ThreeCanvas:
+<Text
+  text="Clix Automations"
+  fontSize={0.8}
+  color="#ffffff"
+  font={staticFile("fonts/Inter-Bold.woff")}  // או URL
+  anchorX="center"
+  anchorY="middle"
+  outlineWidth={0.02}
+  outlineColor={BRAND.pink}
+  letterSpacing={-0.04}
+  maxWidth={8}
+  textAlign="center"
+/>
+```
+
+---
+
+### חומרי Shader בשכבות
+**`lamina`** — חומרים מבוססי שכבות GLSL ל-Three.js. בלי לכתוב GLSL ידנית.  
+שכבות זמינות: `Depth`, `Fresnel`, `Noise`, `Color`, `Gradient`, `Texture`, `Displace`, `Normal`, `Matcap`.
+```tsx
+import { LayerMaterial, Depth, Fresnel, Noise } from "lamina";
+// בתוך ThreeCanvas, על mesh:
+<mesh>
+  <sphereGeometry args={[2, 64, 64]} />
+  <LayerMaterial lighting="physical" roughness={0.3} metalness={0.1}>
+    <Depth
+      colorA={BRAND.blue}
+      colorB={BRAND.pink}
+      near={0} far={3}
+      mapping="world"
+      alpha={1}
+    />
+    <Fresnel
+      color={BRAND.blueL}
+      bias={0.05}
+      intensity={1.2}
+      power={2}
+      mode="add"
+    />
+    <Noise
+      colorA="white" colorB="black"
+      alpha={0.08}
+      scale={4}
+      type="simplex"  // "simplex" | "cell" | "curl" | "white"
+      offset={[frame * 0.01, 0, 0]}  // אנימציה עם frame
+    />
+  </LayerMaterial>
+</mesh>
+```
+
+---
+
+### GUI לפיתוח
+**`leva`** — פאנל שליטה בזמן אמת ב-Remotion Studio. לכוונון ערכים בלי לשנות קוד.  
+**dev בלבד** — להסתיר ב-production עם `hidden`.
+```tsx
+import { useControls, Leva } from "leva";
+
+// בתוך קומפוזיציה:
+const { scale, opacity, color } = useControls("אנימציה", {
+  scale:   { value: 1,    min: 0, max: 3,   step: 0.05 },
+  opacity: { value: 1,    min: 0, max: 1,   step: 0.01 },
+  color:   { value: BRAND.blue },
+});
+
+// בתוך JSX — להוסיף פעם אחת בשורש:
+<Leva hidden={process.env.NODE_ENV === "production"} />
+```
+
+---
+
 ## כללים
 
 - לא מתחילים לכתוב קוד לפני שיש תכנון מאושר
