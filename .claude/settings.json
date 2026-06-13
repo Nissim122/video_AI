@@ -12,7 +12,7 @@
           {
             "type": "command",
             "shell": "powershell",
-            "command": "$screenshot = 'preview/VideoOverlay-f60.png'; $newest = Get-ChildItem src -Recurse -Include '*.ts','*.tsx' -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1; if ($newest -and (-not (Test-Path $screenshot) -or $newest.LastWriteTime -gt (Get-Item $screenshot).LastWriteTime)) { node screenshot.mjs VideoOverlay 60 0.4 2>$null; if (Test-Path $screenshot) { $msg = \"Screenshot ready at $screenshot — read it with the Read tool and verify visually that it matches the task description.\"; Write-Output \"{`\"systemMessage`\": `\"$msg`\"}\"; exit 2 } }",
+            "command": "$screenshot = 'preview/MyComp-f0.png'; $newest = Get-ChildItem src -Recurse -Include '*.ts','*.tsx' -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1; if ($newest -and (-not (Test-Path $screenshot) -or $newest.LastWriteTime -gt (Get-Item $screenshot).LastWriteTime)) { node screenshot.mjs MyComp 0 0.4 2>$null; if (Test-Path $screenshot) { $msg = \"Screenshot ready at $screenshot — read it with the Read tool and verify visually that it matches the task description.\"; Write-Output \"{`\"systemMessage`\": `\"$msg`\"}\"; exit 2 } }",
             "timeout": 90,
             "statusMessage": "Capturing screenshot for visual verification...",
             "asyncRewake": true

@@ -31,13 +31,13 @@ export const ALL_VIDEOS: VideoEntry[] = [
     id:               "ChofshiVideo",
     component:        ChofshiVideo,
     durationInFrames: 1363,
-    status:           "active",
+    status:           "archived",
   },
   {
     id:               "VideoOverlay",
     component:        VideoOverlay,
     durationInFrames: 900,
-    status:           "active",
+    status:           "archived",
   },
 
   // ── פרויקט: scanner ──────────────────────────────────────────────────────
@@ -45,7 +45,7 @@ export const ALL_VIDEOS: VideoEntry[] = [
     id:               "MyComp",
     component:        MyComposition,
     durationInFrames: T.total - SPEED_SAVINGS,
-    status:           "active",
+    status:           "archived",
     schema:           CompositionSchema,
     defaultProps: {
       hookText:    "בניתי סוכן שמוצא אוטומציות לעסק שלך בפחות מדקה",
