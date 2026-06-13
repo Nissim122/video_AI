@@ -10,6 +10,7 @@ import { ChofshiVideo }  from "./chofshi";
 import { VideoOverlay }  from "./chofshi/VideoOverlay";
 import { MyComposition, CompositionSchema, SPEED_SAVINGS } from "./scanner";
 import { T }             from "./scanner/scenes/timeline";
+import { ThirtyPerMonth } from "./30bachodesh";
 
 export type VideoStatus = "active" | "draft" | "archived";
 
@@ -53,6 +54,17 @@ export const ALL_VIDEOS: VideoEntry[] = [
       ctaText:     "",
       screenImage: "scanner/screen-1-pain.jpeg",
     },
+  },
+
+  // ── פרויקט: 30bachodesh ──────────────────────────────────────────────────
+  {
+    id:               "ThirtyPerMonth",
+    component:        ThirtyPerMonth,
+    durationInFrames: 1239,
+    fps:              30,
+    width:            576,
+    height:           1024,
+    status:           "active",
   },
 
   // ── פרויקטים חדשים — מוסיפים כאן ────────────────────────────────────────
