@@ -82,9 +82,11 @@ src/
 ```
 
 **כשיוצרים סרטון חדש:**
-1. `src/videos/[name]/edit-config.ts` — הגדרות (spread על DEFAULT_CONFIG)
-2. `src/videos/[name]/[Name]Video.tsx` — `<VideoEditor {...config} />`
-3. `src/Root.tsx` — הוסף `<Composition id="..." component={...} />`
+1. `src/videos/[name]/config.ts` — הגדרות (spread על DEFAULT_CONFIG)
+2. `src/videos/[name]/index.tsx` — הקומפוזיציה (custom או `<VideoEditor {...config} />`)
+3. `src/videos/index.ts` — הוסף entry ל-`ALL_VIDEOS` עם `status: "active"`
+
+**status:** `"active"` מופיע ב-Remotion Studio | `"draft"` מופיע | `"archived"` מוסתר אוטומטית
 
 ## עיצוב — Clix Brand (תמיד)
 
@@ -744,10 +746,11 @@ export const DRIFT = {
 
 ## edit-config.ts — איך מפעילים רכיבים
 
-כל הרכיבים מוגדרים ב-`src/videos/[name]/edit-config.ts`.  
+כל הרכיבים מוגדרים ב-`src/videos/[name]/config.ts`.  
 `VideoEditor.tsx` קורא ומרנדר הכל אוטומטית — **לא נוגעים ב-VideoEditor ישירות**.
 
 ```ts
+// src/videos/[name]/config.ts
 import { DEFAULT_CONFIG } from "../VideoEditorTypes";
 
 export const VIDEO_CONFIG = {
@@ -762,6 +765,14 @@ export const VIDEO_CONFIG = {
   ],
   outro: { show: true, enterFrame: 820, ctaText: "...", subText: "...", linkText: "clixautomations.com" },
 };
+
+// src/videos/[name]/index.tsx
+import { VideoEditor } from "../../VideoEditor";
+import { VIDEO_CONFIG } from "./config";
+export const MyNameVideo: React.FC = () => <VideoEditor {...VIDEO_CONFIG} />;
+
+// src/videos/index.ts — הוסף:
+// { id: "MyName", component: MyNameVideo, durationInFrames: 900, status: "active" }
 ```
 
 ---

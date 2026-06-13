@@ -10,7 +10,7 @@ import {
 import { PersonBurst } from "../../components/PersonBurst";
 import { StripTransition } from "../../components/StripTransition";
 import { IrisTransition } from "../../components/IrisTransition";
-import { STRIP_TRANSITIONS, IRIS_TRANSITIONS } from "./edit-config";
+import { STRIP_TRANSITIONS, IRIS_TRANSITIONS } from "./config";
 
 const BRAND = {
   pink:   "#e0176b",

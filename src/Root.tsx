@@ -1,24 +1,20 @@
 import "./index.css";
 import React from "react";
 import { Composition, AbsoluteFill, staticFile, Img } from "remotion";
-import { MyComposition, CompositionSchema, SPEED_SAVINGS } from "./videos/scanner/Composition";
-import { T } from "./videos/scanner/scenes/timeline";
+import { ALL_VIDEOS } from "./videos";
 import { PhoneEntrance, PhoneVariant } from "./components/PhoneEntrance";
 import { loadFont } from "@remotion/google-fonts/Heebo";
 import { BRAND } from "./brand";
-import { VideoOverlay } from "./videos/chofshi/VideoOverlay";
-import { ChofshiVideo } from "./videos/chofshi/ChofshiVideo";
-// ── סרטונים לעריכה — מוסיפים כאן import בכל פרויקט חדש ──────────────────────
 
 const { fontFamily } = loadFont();
 
 const VARIANTS: PhoneVariant[] = ["slideUp", "perspectiveLeft", "floatIn", "dropBounce"];
 const LABELS: Record<PhoneVariant, string> = {
-  slideUp: "Slide Up",
+  slideUp:         "Slide Up",
   perspectiveLeft: "Perspective Left",
-  floatIn: "Float In",
-  dropBounce: "Drop Bounce",
-  slideFromRight: "Slide From Right",
+  floatIn:         "Float In",
+  dropBounce:      "Drop Bounce",
+  slideFromRight:  "Slide From Right",
 };
 
 const PhoneShowcase: React.FC = () => (
@@ -70,25 +66,14 @@ const PhoneShowcase: React.FC = () => (
 export const RemotionRoot: React.FC = () => {
   return (
     <>
-      {/* ── סרטונים לעריכה — מוסיפים כאן Composition בכל פרויקט חדש ────────── */}
+      {/* ── סרטונים — נטענים מ-src/videos/index.ts ───────────────────────── */}
+      {ALL_VIDEOS
+        .filter(v => v.status !== "archived")
+        .map(({ status, fps = 30, width = 1080, height = 1920, defaultProps = {}, ...v }) => (
+          <Composition key={v.id} fps={fps} width={width} height={height} defaultProps={defaultProps} {...v} />
+        ))}
 
-      {/* ── פרויקטים קיימים ────────────────────────────────────────────────── */}
-      <Composition
-        id="ChofshiVideo"
-        component={ChofshiVideo}
-        durationInFrames={1363}
-        fps={30}
-        width={1080}
-        height={1920}
-      />
-      <Composition
-        id="VideoOverlay"
-        component={VideoOverlay}
-        durationInFrames={900}
-        fps={30}
-        width={1080}
-        height={1920}
-      />
+      {/* ── כלי עזר — לא סרטונים לעריכה ──────────────────────────────────── */}
       <Composition
         id="PhoneShowcase"
         component={PhoneShowcase}
@@ -96,21 +81,6 @@ export const RemotionRoot: React.FC = () => {
         fps={30}
         width={1920}
         height={600}
-      />
-      <Composition
-        id="MyComp"
-        component={MyComposition}
-        durationInFrames={T.total - SPEED_SAVINGS}
-        fps={30}
-        width={1080}
-        height={1920}
-        schema={CompositionSchema}
-        defaultProps={{
-          hookText: "בניתי סוכן שמוצא אוטומציות לעסק שלך בפחות מדקה",
-          subText: "לידים, פולואפים, הצעות מחיר, תזכורות...",
-          ctaText: "",
-          screenImage: "scanner/screen-1-pain.jpeg",
-        }}
       />
     </>
   );

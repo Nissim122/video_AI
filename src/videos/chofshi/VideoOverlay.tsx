@@ -72,7 +72,7 @@ import {
   TEXT_LINE_REVEALS, ANAMORPHIC_STREAKS,
   PERSON_BURSTS,
   AE_TEXTS,
-} from "./edit-config";
+} from "./config";
 
 const ICON_SIZE = 120;
 const LAUNCH_FRAME = 75;
