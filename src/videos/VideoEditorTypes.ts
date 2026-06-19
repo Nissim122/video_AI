@@ -21,6 +21,8 @@ import type { CAEvent } from "../components/ChromaticAberration";
 import type { TextLineRevealItem } from "../components/TextLineReveal";
 import type { AnamorphicStreakEvent } from "../components/AnamorphicStreak";
 import type { AETextProps } from "../components/AEText";
+import type { Caption } from "@remotion/captions";
+import type { SubtitleStyle } from "../subtitles/subtitle-config";
 
 export interface VideoEditConfig {
   // ── Video source ──────────────────────────────────────────────────────────
@@ -382,6 +384,12 @@ export interface VideoEditConfig {
   aeTexts: AETextProps[];
   stripTransitions: StripEvent[];
   irisTransitions: IrisEvent[];
+
+  // ── Subtitles / Captions ──────────────────────────────────────────────────
+  subtitles: Array<{
+    captions: Caption[];
+    style?: Partial<SubtitleStyle>;
+  }>;
 }
 
 // ── ברירות מחדל — כל הפיצ'רים כבויים ──────────────────────────────────────
@@ -436,4 +444,5 @@ export const DEFAULT_CONFIG: Omit<VideoEditConfig, "src" | "durationInFrames"> =
   aeTexts: [],
   stripTransitions: [],
   irisTransitions: [],
+  subtitles: [],
 };

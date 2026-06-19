@@ -3,6 +3,7 @@ import React from "react";
 import { Composition, AbsoluteFill, staticFile, Img } from "remotion";
 import { ALL_VIDEOS } from "./videos";
 import { PhoneEntrance, PhoneVariant } from "./components/PhoneEntrance";
+import { SubtitleDemoComp } from "./subtitles/SubtitleDemoComp";
 import { loadFont } from "@remotion/google-fonts/Heebo";
 import { BRAND } from "./brand";
 
@@ -81,6 +82,14 @@ export const RemotionRoot: React.FC = () => {
         fps={30}
         width={1920}
         height={600}
+      />
+      <Composition
+        id="SubtitleEditor"
+        component={SubtitleDemoComp}
+        durationInFrames={240}
+        fps={30}
+        width={1080}
+        height={1920}
       />
     </>
   );

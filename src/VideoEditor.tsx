@@ -56,6 +56,7 @@ import { TextLineReveal } from "./components/TextLineReveal";
 import { AnamorphicStreak } from "./components/AnamorphicStreak";
 import { PersonBurst } from "./components/PersonBurst";
 import { AEText } from "./components/AEText";
+import { SubtitleEngine } from "./subtitles/SubtitleEngine";
 
 export const VideoEditor: React.FC<VideoEditConfig> = (config) => {
   const {
@@ -71,6 +72,7 @@ export const VideoEditor: React.FC<VideoEditConfig> = (config) => {
     trackedOverlays, personBursts,
     motionBlurs, dofEvents, lensFlares, caConfig: _ca,
     textLineReveals, anamorphicStreaks, aeTexts,
+    subtitles,
   } = config;
 
   const topGradient =
@@ -282,6 +284,11 @@ export const VideoEditor: React.FC<VideoEditConfig> = (config) => {
 
                 {/* AEText */}
                 {aeTexts.map((ae, i) => <AEText key={i} {...ae} />)}
+
+                {/* Subtitles — מעל הכל, מתחת ל-fades */}
+                {subtitles.map((sub, i) => (
+                  <SubtitleEngine key={i} captions={sub.captions} style={sub.style} />
+                ))}
 
                 {/* Fade transitions — תמיד אחרון */}
                 {fades.map((f, i) => <FadeTransition key={i} {...f} />)}
