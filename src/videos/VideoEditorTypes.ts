@@ -30,6 +30,8 @@ export interface VideoEditConfig {
   durationInFrames: number;
 
   // ── Color grade & vignette ────────────────────────────────────────────────
+  /** gradient shadow at the top of the frame (rgba 0,0,0,0.55 → transparent) */
+  topVignette: boolean;
   grade: {
     show: boolean;
     vignetteStrength: number;
@@ -394,6 +396,7 @@ export interface VideoEditConfig {
 
 // ── ברירות מחדל — כל הפיצ'רים כבויים ──────────────────────────────────────
 export const DEFAULT_CONFIG: Omit<VideoEditConfig, "src" | "durationInFrames"> = {
+  topVignette: true,
   grade: { show: true, vignetteStrength: 0.55, tone: "cinematic", brightness: 1, contrast: 1.05 },
   logo: { show: true, corner: "top-right", fadeInFrame: 15 },
   outro: { show: false, enterFrame: 0, ctaText: "", subText: "", linkText: "clixautomations.com" },

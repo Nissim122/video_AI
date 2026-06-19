@@ -56,12 +56,14 @@ import { TextLineReveal } from "./components/TextLineReveal";
 import { AnamorphicStreak } from "./components/AnamorphicStreak";
 import { PersonBurst } from "./components/PersonBurst";
 import { AEText } from "./components/AEText";
+import { StripTransition } from "./components/StripTransition";
+import { IrisTransition } from "./components/IrisTransition";
 import { SubtitleEngine } from "./subtitles/SubtitleEngine";
 
 export const VideoEditor: React.FC<VideoEditConfig> = (config) => {
   const {
     src, durationInFrames,
-    grade, logo, outro, drift, caConfig, particleField,
+    topVignette, grade, logo, outro, drift, caConfig, particleField,
     pips, chapters, lowerThirds, textPops, callouts, fades,
     bulletLists, statCards, highlights, ctaButtons, socialHandles,
     kineticTexts, brolls, reactions, punches,
@@ -72,6 +74,7 @@ export const VideoEditor: React.FC<VideoEditConfig> = (config) => {
     trackedOverlays, personBursts,
     motionBlurs, dofEvents, lensFlares, caConfig: _ca,
     textLineReveals, anamorphicStreaks, aeTexts,
+    stripTransitions, irisTransitions,
     subtitles,
   } = config;
 
@@ -118,7 +121,9 @@ export const VideoEditor: React.FC<VideoEditConfig> = (config) => {
                 {glowPulses.map((gp, i) => <GlowPulse key={i} {...gp} />)}
 
                 {/* Top vignette */}
-                <AbsoluteFill style={{ background: topGradient, pointerEvents: "none" }} />
+                {topVignette && (
+                  <AbsoluteFill style={{ background: topGradient, pointerEvents: "none" }} />
+                )}
 
                 {/* B-Roll overlays */}
                 {brolls.map((br, i) => <BRollOverlay key={i} {...br} />)}
@@ -289,6 +294,10 @@ export const VideoEditor: React.FC<VideoEditConfig> = (config) => {
                 {subtitles.map((sub, i) => (
                   <SubtitleEngine key={i} captions={sub.captions} style={sub.style} />
                 ))}
+
+                {/* Strip & Iris transitions */}
+                {stripTransitions.length > 0 && <StripTransition events={stripTransitions} />}
+                {irisTransitions.length > 0 && <IrisTransition events={irisTransitions} />}
 
                 {/* Fade transitions — תמיד אחרון */}
                 {fades.map((f, i) => <FadeTransition key={i} {...f} />)}

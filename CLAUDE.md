@@ -35,6 +35,64 @@ rgba = cv2.merge([r, g, b, a])
 
 - [Remotion Docs](https://www.remotion.dev/docs) — API רשמי, hooks, components, rendering
 
+## כלי עריכה — ידע לשימוש אוטומטי
+
+### `frames.mjs` — המרת זמן ↔ פריימים
+**מתי:** בכל פעם שצריך לתרגם ms/שניות/timecode לפריים או להפך — לפני שמגדירים `enterFrame` בconfig.
+
+```bash
+node frames.mjs 1500ms        # → 45 frames
+node frames.mjs 45            # → 1500ms | 1.500s | 0:01.500
+node frames.mjs 1:23.5        # → 2505 frames (mm:ss.ms)
+node frames.mjs 30 90         # range: כמה frames/ms בין 30 ל-90
+node frames.mjs 1500ms 25     # FPS שונה מ-30
+# או דרך npm:
+npm run frames -- 1500ms
+```
+
+**כלל:** כשהמשתמש אומר "בדקה ו-20 שניות" או "אחרי 800 מילישניות" — מריץ `frames.mjs` לפני שכותב ערך בconfig.
+
+---
+
+### `timeline.mjs` — ציר זמן של כל האירועים בסרטון
+**מתי:** לפני עריכת config קיים, כדי להבין מה קורה מתי — בלי לקרוא את כל הקוד.
+
+```bash
+node timeline.mjs ThirtyPerMonth
+node timeline.mjs Chofshi
+# או:
+npm run timeline -- ThirtyPerMonth
+```
+
+**פלט לדוגמה:**
+```
+frame   15   0:00.5  │  logo  ·  corner:top-right
+frame   50   0:01.7  │  AEText  ·  "עסק" y=0.5
+frame  120   0:04.0  │  textPop  ·  "חוסך 10 שעות" style=pink
+frame  600   0:20.0  │  CTA  ·  "לפרטים נוספים"
+frame  870   0:29.0  │  ── FADE OUT ──
+frame  900   0:30.0  │  ── OUTRO ──
+```
+
+**כלל:** כשמתבקש "להוסיף X אחרי ה-textPop" — מריץ `timeline.mjs` קודם כדי לדעת באיזה פריים ה-textPop מסתיים.
+
+---
+
+### `screenshot.mjs` — רינדור פריים בודד (לאימות ויזואלי)
+```bash
+node screenshot.mjs ThirtyPerMonth 90      # frame 90 בscale 0.4
+node screenshot.mjs ThirtyPerMonth 90 0.3  # scale קטן יותר
+npm run ss -- ThirtyPerMonth 90
+```
+
+### `subtitle-preview.mjs` — רינדור כמה פריימים לבדיקת כתוביות
+```bash
+node subtitle-preview.mjs ThirtyPerMonth              # auto: 10%/40%/75%
+node subtitle-preview.mjs ThirtyPerMonth 60 300 600   # פריימים ספציפיים
+```
+
+---
+
 ## אימות ויזואלי — חובה לפני סיום כל משימה
 
 לאחר כל עריכה לקובץ קומפוזיציה (`src/videos/[name]/*.tsx`, `src/videos/[name]/edit-config.ts`, `src/videos/[name]/scenes/*.tsx`):
@@ -1003,6 +1061,29 @@ import { filmBurn } from "@remotion/transitions/film-burn";
 </TransitionSeries>
 // timing: springTiming | linearTiming
 // slide direction: "from-left" | "from-right" | "from-top" | "from-bottom"
+```
+
+---
+
+### ניתוח אודיו בזמן render
+**`@remotion/media-utils`** — `getAudioData()` + `visualizeAudio()` לניתוח waveform בתוך קומפוזיציה.  
+**שימוש עיקרי:** כתוביות שמגיבות לעוצמת הקול, כפתורים שמדגמים לפי beat, כל אפקט audio-driven.
+
+```tsx
+import { getAudioData, visualizeAudio } from "@remotion/media-utils";
+import { useCurrentFrame, useVideoConfig, staticFile } from "remotion";
+
+// ב-component (async — עם delayRender):
+const audioData = await getAudioData(staticFile("voiceover.mp3"));
+
+// בתוך render (per frame):
+const { fps } = useVideoConfig();
+const frame = useCurrentFrame();
+const amplitudes = visualizeAudio({ fps, frame, audioData, numberOfSamples: 32 });
+const loudness = amplitudes[0]; // 0–1
+
+// שימוש — subtitle שמגדיל לפי עוצמת הדיבור:
+const scale = 1 + loudness * 0.12;
 ```
 
 ---

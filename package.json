@@ -16,6 +16,7 @@
     "@remotion/light-leaks": "^4.0.474",
     "@remotion/lottie": "^4.0.474",
     "@remotion/media": "^4.0.475",
+    "@remotion/media-utils": "^4.0.474",
     "@remotion/motion-blur": "^4.0.474",
     "@remotion/noise": "^4.0.474",
     "@remotion/paths": "^4.0.474",
@@ -47,6 +48,7 @@
     "@types/react": "19.2.7",
     "@types/three": "^0.184.1",
     "@types/web": "0.0.166",
+    "esbuild-register": "^3.6.0",
     "eslint": "9.19.0",
     "leva": "^0.10.1",
     "prettier": "3.8.1",
@@ -60,7 +62,10 @@
     "ss": "node screenshot.mjs",
     "ss:overlay": "node screenshot.mjs VideoOverlay",
     "ss:chofshi": "node screenshot.mjs ChofshiVideo",
-    "ss:main": "node screenshot.mjs MyComp"
+    "ss:main": "node screenshot.mjs MyComp",
+    "sub:preview": "node subtitle-preview.mjs",
+    "frames": "node frames.mjs",
+    "timeline": "node timeline.mjs"
   },
   "sideEffects": [
     "*.css"
